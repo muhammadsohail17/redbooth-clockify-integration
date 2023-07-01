@@ -1,4 +1,6 @@
 import { Schema, model, models } from "mongoose";
+import mongoose from "mongoose";
+
 
 const userSchema = new Schema({
   name: String,
@@ -18,6 +20,16 @@ const loggingSchema = new Schema({
   createdAt: Number,
 });
 
+const registerUserSchema = new mongoose.Schema({
+  fullname: String,
+  email: String,
+  password: String
+})
+
+
+// Register Users!
+const registerUser = mongoose.models.registerUsers || mongoose.model('registerUsers', registerUserSchema);
+
 // Create the User model
 const User = models.User || model("User", userSchema);
 
@@ -27,4 +39,4 @@ const Project = models.Project || model("Project", projectSchema);
 // Create the Logging model
 const Logging = models.Logging || model("Logging", loggingSchema);
 
-export { User, Project, Logging };
+export { User, Project, Logging, registerUser };
