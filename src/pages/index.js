@@ -1,100 +1,69 @@
-import mongoose from "mongoose";
-import connectDB from "./db";
-// import { User, Project, Logging, Task } from "./dataModel";
-const { User, Project, Task, Logging } = require('./dataModel')
-import Head from "next/head";
-import Link from "next/link";
+import Head from 'next/head'
+import Link from 'next/link'
+import React from 'react'
+import connectDB from '@/data/db'
+import Dashboard from '@/components/Dashboard'
 
-export const getServerSideProps = async () => {
+export async function getServerSideProps() {
+    const { User, Project, Task, Logging } = require('../data/dataModel')
 
-  try {
-    await connectDB();
-    console.log('CONNECTED TO MONGO!');
+    try {
+        await connectDB();
+        console.log('CONNECTED TO MONGO 1!');
+        const user = await User.findOne({ email: 'ufaq3022@gmail.com' }).lean();
+        const userLoggings = await Logging.find({ rbUserId: 6237218 }).sort({ rbCommentId: -1 }).limit(30).lean();
 
-    const users = await User.find({}).sort({ name: 1 }).lean();
-    const projects = await Project.find({}).sort({ name: -1 }).lean();
-    const loggings = await Logging.find({}).limit(50).sort({ createdAt: -1 });
-    const tasks = await Task.find({}).limit(30);
-    // console.log("Fetched Loggings", loggings)
-    // console.log("Fetched Loggings", tasks)
-    // console.log('Fetched Projects!', projects);
+        const taskIds = userLoggings.map(logging => logging.rbTaskId);
+        // Creates an array of taskIds by extracting the rbTaskId property from each object in the userLoggings array
+        const userTasks = await Task.find({ rbTaskId: { $in: taskIds } });
+        // Finds all tasks where the rbTaskId property is included in the taskIds array and awaits the result
+        const projectIds = userTasks.map(task => task.rbProjectId);
+        // Creates an array of projectIds by extracting the rbProjectId property from each object in the userTasks array
+        const projects = await Project.find({ rbProjectId: { $in: projectIds } }).lean();
+        
+        const loggingsWithTasksAndProjects = userLoggings.map(logging => {
+            const task = userTasks.find(task => task.rbTaskId === logging.rbTaskId);
+            // Finds the task object in the userTasks array where the rbTaskId matches the rbTaskId of the current logging object
 
-    return {
-      props: {
-        users: JSON.parse(JSON.stringify(users)),
-        projects: JSON.parse(JSON.stringify(projects)),
-        loggings: JSON.parse(JSON.stringify(loggings)),
-        tasks: JSON.parse(JSON.stringify(tasks))
-      },
-    };
+            const project = projects.find(project => project.rbProjectId === task.rbProjectId);
+            // Finds the project object in the projects array where the _id matches the projectId of the current task object
 
-  } catch (error) {
-    console.log(error);
-    return {
-      notFound: true,
-    };
-  }
-};
+            return { ...logging, task, project };
+            // Returns a new object that includes the original logging object, task object, and project object
+        });
 
-export default function Home({ users, projects, loggings, tasks }) {
+        // const loggingsWithTasks = userLoggings.map(logging => {
+        //     const task = userTasks.find(task => task.rbTaskId === logging.rbTaskId);
+        //     return { ...logging, task };
+        // });
+        console.log("loggingsWithTasksAndProjects", loggingsWithTasksAndProjects)
 
-  return <>
-    <Head>
-      <title>Redbooth + Clockify Integration</title>
-    </Head>
+        return {
+            props: {
+                user: JSON.parse(JSON.stringify(user)),
+                loggingsWithTasksAndProjects: JSON.parse(JSON.stringify(loggingsWithTasksAndProjects)),
+                projects: JSON.parse(JSON.stringify(projects)),
+            },
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            notFound: true,
+        };
+    }
+}
 
-    <div className="px-12 ">
-      {/* month=6&year=2023&invoice=1&userId=6237218 */}
-      
-      <h1 className="text-center text-3xl my-4 " ><span className="text-red-400">Redbooth</span> + <span className="text-blue-400">Clockify</span></h1>
-      <Link href='/single' className="text-2xl font-semibold text-green-500">
-        Generate Invoice
-      </Link>
-      <div className="flex flex-col items-center">
-        <div className="flex justify-center">
-          <div className="border-t border-b border-r border-l border-slate-300 pr-16 pl-10 py-7 bg-gray-50 ">
-            <h1 className="text-3xl font-bold text-red-500">{users.length} People</h1>
-            <div className="my-6 font-normal text-xl ">
-              {users.map((user, index) => (
-                <li key={index} className="list-none my-2 text-blue-600">{user.name}</li>
-              ))}
-            </div>
-          </div>
 
-          <div className="border-t border-b border-slate-300 pr-4 pl-10 py-7 bg-gray-50">
-            <h1 className="text-3xl font-bold text-red-500">Tasks (30)</h1>
-            <div className="my-6 font-normal text-xl">
-              {tasks.map((task, index) => (
-                <li key={index} className="list-none my-2 text-blue-600">{task.name}</li>
-              ))}
 
-            </div>
-          </div>
 
-          <div className="border-t border-l border-r border-b border-slate-300 pr-10 pl-10 py-7 bg-gray-50 text-gray-600 ">
-            <h1 className="text-3xl font-bold text-red-500">User Emails</h1>
-            <div className="my-6 font-normal text-xl text-blue-800">
-              {users.map((user, index) => (
-                <li key={index} className="list-none my-2 text-blue-600">{user.email}</li>
-              ))}
-            </div>
-          </div>
+export default function Home({ projects, loggingsWithTasksAndProjects }) {
 
-        </div>
+    return <>
+        {console.log("loggingsWithTasks", loggingsWithTasksAndProjects)}
+        <Head>
+            <title>Dashboard</title>
+        </Head>
+        <Dashboard projects={projects} userData={loggingsWithTasksAndProjects} />
 
-        <div className="flex justify-center">
-          <div className="border-b border-l border-slate-300 pr-36 pl-10 py-7 bg-gray-50 text-3xl font-bold text-red-500">Loggings
-            <div className="my-6 font-normal text-xl text-blue-800">
-              {loggings.map((log, index) => (
-                <li key={index} className="list-none text-blue-600 inline-block p-5">{Math.floor(log.minutes / 60)}H</li>
-              ))}
-            </div>
-          </div>
-          {/* <div className="border-b border-r border-l border-slate-300 pr-36 pl-10 py-7 bg-gray-50">Projects <div className="my-2 text-5xl font-light text-green-600">123</div></div>
-          <div className="border-b  border-r border-slate-300 pr-36 pl-10 py-7 bg-gray-50">User <div className="my-2 text-5xl font-light text-green-600">123</div></div> */}
-        </div>
-      </div>
-    </div>
-
-  </>
+    </>
 }
