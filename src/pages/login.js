@@ -5,7 +5,7 @@ import Head from 'next/head'
 export async function getServerSideProps({ req }) {
     // Get user session from the request headers
     const session = await getSession({ req })
-    console.log(session)
+    // console.log(session)
     if (session) {
         return {
             redirect: {

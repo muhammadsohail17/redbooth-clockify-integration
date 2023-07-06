@@ -2,11 +2,11 @@ import React from 'react'
 import Link from 'next/link'
 import { getSession, signIn } from 'next-auth/react'
 import { signOut } from "next-auth/react"
+import { unixTimestampToDate } from '@/data/util'
 
-export default function Dashboard({ projects, userData, userLoggings }) {
-
+export default function Dashboard({ projects, userData, userLoggings, data }) {
     return <>
-        {/* {console.log(userLoggings)} */}
+        {/* {console.log('Dashboard', data.loggingsData)} */}
         <div className="flex overflow-x-hidden min-h-screen">
             <div className="px-4 py-2 bg-gray-200 bg-indigo-600 lg:w-1/5">
                 <svg xmlns="http://www.w3.org/2000/svg" className="inline w-8 h-8 text-white lg:hidden" fill="none"
@@ -14,7 +14,7 @@ export default function Dashboard({ projects, userData, userLoggings }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
                 <div className="my-2">
-                    <h1 className="text-2xl font-bold text-white inline">Welcome User!</h1>
+                    <h1 className="text-2xl font-bold text-white inline">Welcome {data.name}!</h1>
 
                     <span className='' onClick={() => signOut()}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-9 ml-3 mb-4 inline text-white  hover:text-red-400 cursor-pointer fixed bottom-0 left-0">
@@ -23,16 +23,16 @@ export default function Dashboard({ projects, userData, userLoggings }) {
                     </span>
 
                 </div>
-                {projects.map((project, id) => (
-                    <h1 key={id} className='text-white text-2xl'>{project.name}</h1>
+                {/* {projects.map((project, id) => ( */}
+                <h1 className='text-white text-2xl'>Project Name</h1>
 
-                ))}
+                {/* ))} */}
 
 
             </div>
             <div className="w-full px-4 py-2 bg-gray-200 lg:w-full">
                 <div className="container mx-auto mt-14">
-                    <Link href="/invoice">
+                    <Link href="/generateInvoice">
                         <button className='bg-blue-600 px-2 py-2 text-white rounded-lg hover:bg-blue-700 mb-3 absolute right-2.5 top-1 mt-2'>Generate Invoice</button>
                     </Link>
                     <div className="grid gap-4 lg:grid-cols-2">
@@ -44,7 +44,7 @@ export default function Dashboard({ projects, userData, userLoggings }) {
 
                             </div>
                             <div className="mx-4">
-                                <h4 className="text-2xl font-semibold text-gray-700">100</h4>
+                                <h4 className="text-2xl font-semibold text-gray-700">20</h4>
                                 <div className="text-gray-500">Last Week Hours</div>
                             </div>
                         </div>
@@ -56,8 +56,8 @@ export default function Dashboard({ projects, userData, userLoggings }) {
 
                             </div>
                             <div className="mx-4">
-                                <h4 className="text-2xl font-semibold text-gray-700">30</h4>
-                                <div className="text-gray-500">Last Month Hours</div>
+                                <h4 className="text-2xl font-semibold text-gray-700">{data.totalLoggedHours}</h4>
+                                <div className="text-gray-500">Current Month Hours</div>
                             </div>
                         </div>
 
@@ -73,13 +73,10 @@ export default function Dashboard({ projects, userData, userLoggings }) {
                                         <tr>
                                             <th
                                                 className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50">
-                                                Task Name</th>
-                                            <th
-                                                className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50">
                                                 Project Name</th>
                                             <th
                                                 className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50">
-                                                Logging Time</th>
+                                                Week Ending</th>
                                             <th
                                                 className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50">
                                                 Logged Hours</th>
@@ -90,45 +87,50 @@ export default function Dashboard({ projects, userData, userLoggings }) {
                                     </thead>
 
                                     <tbody className="bg-white">
-                                        {userData.map((data, id) => (
+                                        {/* {userData.map((data, id) => ( */}
+                                        {data.loggingsData.map((project, id) => (
+                                            <>
+                                                {project.projectLoggingsData.map((weeklyLogging, id) => (
+                                                    <tr key={id} >
+                                                        <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                                            <div className="flex items-center">
+                                                                <div className="ml-4">
+                                                                    <div className="text-sm font-medium leading-5 text-gray-900">
+                                                                        {project.name}
+                                                                    </div>
 
-                                            <tr key={id}>
-                                                <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
-                                                    <div className="flex items-center">
-                                                        {/* <div className="flex-shrink-0 w-10 h-10">
-                                                        <img className="w-10 h-10 rounded-full"
-                                                            src="https://source.unsplash.com/user/erondu"
-                                                            alt="admin dashboard ui" />
-                                                    </div> */}
-
-                                                        <div className="ml-4">
-                                                            <div className="text-sm font-medium leading-5 text-gray-900">
-                                                                {data.task.name}
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
+                                                        </td>
 
-                                                <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
-                                                    <div className="text-sm leading-5 text-gray-500">{data.project.name}</div>
-                                                </td>
 
-                                                <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
-                                                    <span
-                                                        className="inline-flex px-2 text-xs font-semibold leading-5 text-green-800">{data.timeTrackingOn}</span>
-                                                </td>
+                                                        <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                                            <span
+                                                                className="inline-flex px-2 text-xs font-semibold leading-5 text-green-800">
+                                                                {unixTimestampToDate(weeklyLogging.rangeEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
 
-                                                <td className="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200 text-center ">
-                                                    <span
-                                                        className="inline-flex px-2 text-xs font-semibold">{Math.floor(data.minutes / 60)}h {(data.minutes % 60) > 0 ? ` ${data.minutes % 60}m` : ''}</span>
-                                                </td>
-                                                {/* <td
+                                                            </span>
+                                                        </td>
+
+                                                        <td className="px-6 py-4 text-left text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200 text-center ">
+                                                            <span
+                                                                className="inline-flex px-2 text-xs font-semibold">
+                                                                {/* {Math.floor(data.minutes / 60)}h {(data.minutes % 60) > 0 ? ` ${data.minutes % 60}m` : ''} */}
+                                                                {weeklyLogging.weeklyTotalLoggedHours}
+                                                            </span>
+                                                        </td>
+                                                        {/* <td
                                                     className="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200">
                                                     <span
                                                         className="inline-flex px-2 text-xs font-semibold">Yes</span>
                                                 </td> */}
-                                            </tr>
+                                                    </tr>
+                                                ))}
+                                            </>
+
                                         ))}
+
+                                        {/* ))} */}
 
                                     </tbody>
                                 </table>

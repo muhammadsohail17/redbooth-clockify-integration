@@ -5,6 +5,8 @@ const userSchema = new Schema({
   email: String,
 });
 
+const User = models.User || model("User", userSchema);
+
 const projectSchema = new Schema({
   name: String,
   rbProjectId: Number,
@@ -27,7 +29,6 @@ const taskSchema = new Schema({
 });
 
 // Create the User model
-const User = models.User || model("User", userSchema);
 
 // Create the Projects model
 const Task = models.Task || model("Task", taskSchema);
@@ -37,5 +38,4 @@ const Project = models.Project || model("Project", projectSchema);
 
 // Create the Logging model
 const Logging = models.Logging || model("Logging", loggingSchema);
-
 export { User, Task, Project, Logging };

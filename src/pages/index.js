@@ -4,19 +4,25 @@ import React from 'react'
 import connectDB from '@/data/db'
 import Dashboard from '@/components/Dashboard'
 import { getSession, signIn } from 'next-auth/react'
+import { generateInvoiceData } from '@/data/util'
 
 export async function getServerSideProps({ req }) {
 
     const { User, Project, Task, Logging } = require('../data/dataModel')
     const session = await getSession({ req })
-    console.log("session", session)
+
+
 
     if (session) {
         try {
             await connectDB();
-            const user = await User.findOne({ email: 'ufaq3022@gmail.com' }).lean();
-            const userLoggings = await Logging.find({ rbUserId: 6237218 }).sort({ rbCommentId: -1 }).limit(10).lean();
+            // console.log("Index!", session.user.email)
 
+            const user = await User.findOne({ email: session.user.email }).lean();
+            //get rbUserId as userId from user object
+            const { rbUserId: userId } = user;
+            // get all time user loggings
+            const userLoggings = await Logging.find({ rbUserId: 6237218 }).sort({ rbCommentId: -1 }).limit(10).lean();
             const taskIds = userLoggings.map(logging => logging.rbTaskId);
             // Creates an array of taskIds by extracting the rbTaskId property from each object in the userLoggings array
             const userTasks = await Task.find({ rbTaskId: { $in: taskIds } });
@@ -27,13 +33,8 @@ export async function getServerSideProps({ req }) {
 
             const loggingsWithTasksAndProjects = userLoggings.map(logging => {
                 const task = userTasks.find(task => task.rbTaskId === logging.rbTaskId);
-                // Finds the task object in the userTasks array where the rbTaskId matches the rbTaskId of the current logging object
-
                 const project = projects.find(project => project.rbProjectId === task.rbProjectId);
-                // Finds the project object in the projects array where the _id matches the projectId of the current task object
-
                 return { ...logging, task, project };
-                // Returns a new object that includes the original logging object, task object, and project object
             });
 
             // const loggingsWithTasks = userLoggings.map(logging => {
@@ -42,13 +43,23 @@ export async function getServerSideProps({ req }) {
             // });
             // console.log("loggingsWithTasksAndProjects", loggingsWithTasksAndProjects)
 
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth() + 1;
+            const currentYear = currentDate.getFullYear();
+
+            var data = await generateInvoiceData(currentMonth, currentYear, userId);
+            const { loggingsData } = data;
+            const [{ projectLoggingsData }] = loggingsData;
+            const [{ weeklyLoggingsData }] = projectLoggingsData;
+
             return {
                 props: {
                     user: JSON.parse(JSON.stringify(user)),
                     loggingsWithTasksAndProjects: JSON.parse(JSON.stringify(loggingsWithTasksAndProjects)),
                     projects: JSON.parse(JSON.stringify(projects)),
                     userLoggings: JSON.parse(JSON.stringify(userLoggings)),
-                    session: session
+                    data: JSON.parse(JSON.stringify(data)),
+
                 },
             };
         } catch (error) {
@@ -61,18 +72,20 @@ export async function getServerSideProps({ req }) {
     } else {
         return {
             redirect: { destination: '/login' },
-            props: { }
+            props: {}
         }
     }
 }
 
-export default function Home({ projects, loggingsWithTasksAndProjects, userLoggings, session }) {
+export default function Home({ projects, loggingsWithTasksAndProjects, userLoggings, data }) {
     return <>
         <Head>
+
             <title>Dashboard</title>
         </Head>
-        {console.log("Page Session",session)}
-        <Dashboard projects={projects} userData={loggingsWithTasksAndProjects} userLoggings={userLoggings} />
+        {console.log('Index', data)}
+
+        <Dashboard projects={projects} userData={loggingsWithTasksAndProjects} userLoggings={userLoggings} data={data} />
 
     </>
 }
