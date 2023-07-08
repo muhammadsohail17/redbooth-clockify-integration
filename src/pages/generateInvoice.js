@@ -1,8 +1,8 @@
 import axios from 'axios';
 import Head from 'next/head'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { getSession } from 'next-auth/react';
-
+import $ from 'jquery';
 
 export async function getServerSideProps({ req }) {
     const { User, Task, Project, Logging } = require('../data/dataModel');
@@ -16,21 +16,10 @@ export async function getServerSideProps({ req }) {
     }
 }
 
+
 export default function GenerateInvoice({ user }) {
     const { rbUserId: newUserId } = user;
-    const [formData, setFormData] = useState({
-        month: '1',
-        year: '2023',
-        userId: newUserId,
-        hourlyRate: '',
-        invoiceNo: '',
-        customItem: null,
-        customValue: null
-    });
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
 
     return <>
         <Head>
@@ -38,7 +27,6 @@ export default function GenerateInvoice({ user }) {
                 Generate Invoice
             </title>
         </Head>
-
 
         <div className='bg-gray-100 min-h-screen'>
             <div className="container max-w-3xl mx-auto ">
@@ -55,13 +43,11 @@ export default function GenerateInvoice({ user }) {
                             </div>
                             <div className="grid grid-cols-3 gap-2">
                                 <div className="mt-1 space-y-2">
-                                    <label className="block text-sm font-medium leading-6 text-gray-900">`Select` User</label>
+                                    <label className="block text-sm font-medium leading-6 text-gray-900">User</label>
                                     <select
                                         name="userId"
-                                        value={user.rbUserId}
-                                        onChange={handleChange}
                                         className="p-2 block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                                        <option value={user.rbUserId}>{user.name}</option>
+                                        <option value={newUserId}>{user.name}</option>
                                     </select>
                                 </div>
 
@@ -69,8 +55,7 @@ export default function GenerateInvoice({ user }) {
                                     <label className="block text-sm font-medium leading-6 text-gray-900">Select Month</label>
                                     <select
                                         name="month"
-                                        value={formData.month}
-                                        onChange={handleChange}
+                                        defaultValue={'1'}
                                         className="p-2 block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                                         <option value="1">January</option>
                                         <option value="2">February</option>
@@ -90,11 +75,9 @@ export default function GenerateInvoice({ user }) {
                                 <div className="mt-1 space-y-2">
                                     <label className="block text-sm font-medium leading-6 text-gray-900">Select Year</label>
                                     <select name="year"
-                                        value={formData.year}
-
-                                        onChange={handleChange}
+                                        defaultValue={'2023'}
                                         className="p-2 block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                                        <option value="2023" defaultValue>2023</option>
+                                        <option value="2023">2023</option>
                                         <option value="2024">2024</option>
                                         <option value="2025">2025</option>
                                         <option value="2026">2026</option>
@@ -103,13 +86,22 @@ export default function GenerateInvoice({ user }) {
 
                                 <div className="mt-1 space-y-2">
                                     <label className="block text-sm font-medium leading-6 text-gray-900">Hourly Rate</label>
-                                    <input onChange={handleChange} value={formData.hourlyRate} type="number" name="hourlyRate" step="any" min="0" className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                    <input type="number" name="hourlyRate" step="any" min="0" className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                                 </div>
                                 <div className="mt-1 space-y-2">
                                     <label className="block text-sm font-medium leading-6 text-gray-900">Invoice No</label>
-                                    <input onChange={handleChange} value={formData.invoiceNo} type="number" name="invoiceNo" min="0" className="p-2  block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                    <input type="number" name="invoiceNo" min="0" className="p-2  block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                                 </div>
                             </div>
+                            <div className="customItemContainer">
+
+                            </div>
+                            <div>
+                                <button type="submit" className="addCustomItem p-[4px] mt-3 px-3 text-sm rounded-md text-white bg-pink-500 hover:bg-pink-800">
+                                    Add Custom Item
+                                </button>
+                            </div>
+
                             {/* <input type="hidden" name="generatePdf" value="1" /> */}
                             <button type="submit" className="p-2 mt-3 px-10 text-sm rounded-md text-white bg-blue-500 hover:bg-blue-800">
                                 Generate Invoice
@@ -117,7 +109,7 @@ export default function GenerateInvoice({ user }) {
                         </form>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     </>
 }

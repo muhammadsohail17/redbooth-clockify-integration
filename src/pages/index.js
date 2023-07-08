@@ -5,13 +5,10 @@ import connectDB from '@/data/db'
 import Dashboard from '@/components/Dashboard'
 import { getSession, signIn } from 'next-auth/react'
 import { generateInvoiceData } from '@/data/util'
-
 export async function getServerSideProps({ req }) {
 
     const { User, Project, Task, Logging } = require('../data/dataModel')
     const session = await getSession({ req })
-
-
 
     if (session) {
         try {
@@ -83,7 +80,7 @@ export default function Home({ projects, loggingsWithTasksAndProjects, userLoggi
 
             <title>Dashboard</title>
         </Head>
-        {console.log('Index', data)}
+        {/* {console.log('Index', data)} */}
 
         <Dashboard projects={projects} userData={loggingsWithTasksAndProjects} userLoggings={userLoggings} data={data} />
 

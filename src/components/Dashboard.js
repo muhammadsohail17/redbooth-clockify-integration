@@ -115,15 +115,10 @@ export default function Dashboard({ projects, userData, userLoggings, data }) {
                                                         <td className="px-6 py-4 text-left text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200 text-center ">
                                                             <span
                                                                 className="inline-flex px-2 text-xs font-semibold">
-                                                                {/* {Math.floor(data.minutes / 60)}h {(data.minutes % 60) > 0 ? ` ${data.minutes % 60}m` : ''} */}
                                                                 {weeklyLogging.weeklyTotalLoggedHours}
                                                             </span>
                                                         </td>
-                                                        {/* <td
-                                                    className="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200">
-                                                    <span
-                                                        className="inline-flex px-2 text-xs font-semibold">Yes</span>
-                                                </td> */}
+                                                      
                                                     </tr>
                                                 ))}
                                             </>

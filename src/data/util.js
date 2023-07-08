@@ -74,6 +74,7 @@ const generateInvoiceData = async (month, year, userId, hourlyRate, invoiceNo, c
     const weeklyRanges = getWeeklyRanges(startDate, endDate);
     const projects = await Project.find().lean();
     const user = await User.findOne({ rbUserId: userId }, { password: 0 }).lean();
+    console.log('User', user)
     const loggings = await Logging.find({ rbUserId: userId }).sort({ createdAt: 'desc' }).exec();
 
     var totalLoggedHours = 0;
@@ -139,27 +140,27 @@ const generateInvoiceData = async (month, year, userId, hourlyRate, invoiceNo, c
         loggingsData
     }
 
-    // if (customItem && customValue) {
-    //     var customItems = [];
-    //     if (typeof customItem == 'object' && typeof customValue == 'object') {
-    //         for (let i = 0; i < customItem.length; i++) {
-    //             if (customItem[i] && customValue[i]) {
-    //                 customItems.push({
-    //                     item: customItem[i],
-    //                     value: customValue[i]
-    //                 });
-    //                 data.monthlyTotals += parseFloat(customValue);
-    //             }
-    //         }
-    //     } else {
-    //         customItems.push({
-    //             item: customItem,
-    //             value: customValue
-    //         });
-    //         data.monthlyTotals += parseFloat(customValue);
-    //     }
-    //     data.customItems = customItems;
-    // }
+    if (customItem && customValue) {
+        var customItems = [];
+        if (typeof customItem == 'object' && typeof customValue == 'object') {
+            for (let i = 0; i < customItem.length; i++) {
+                if (customItem[i] && customValue[i]) {
+                    customItems.push({
+                        item: customItem[i],
+                        value: customValue[i]
+                    });
+                    data.monthlyTotals += parseFloat(customValue[i]);
+                }
+            }
+        } else {
+            customItems.push({
+                item: customItem,
+                value: customValue
+            });
+            data.monthlyTotals += parseFloat(customValue);
+        }
+        data.customItems = customItems;
+    }
 
     data.monthlyTotals = Math.round(data.monthlyTotals * 100) / 100;
 
