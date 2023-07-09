@@ -1,11 +1,11 @@
 import React from 'react'
-import connectDB from "./db";
+import connectDB from "../../data/db";
 import Head from 'next/head';
 // import { User, Project, Logging, Task} from "./dataModel";
 
 
 export async function getServerSideProps() {
-    const { User, Project, Task, Logging } = require('./dataModel')
+    const { User, Project, Task, Logging } = require('../../data/dataModel')
 
     try {
         await connectDB();

@@ -1,100 +1,42 @@
-import mongoose from "mongoose";
-import connectDB from "./db";
-// import { User, Project, Logging, Task } from "./dataModel";
-const { User, Project, Task, Logging } = require('./dataModel')
-import Head from "next/head";
-import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+/**
+ * Server side props function runs on serverside
+ * Checks whether the user is logged in or not and takes appropriate action
+ * 
+ * This is our root index page which redirects the user to appropriate link
+ * This file will be executed if someone visits the app url without mentioning any specific path in there
+ * 
+ * @param {*} param 
+ * @returns 
+ */
+export async function getServerSideProps(ctx) {
+    // Get user session from the request headers
+    const session = await getServerSession(ctx.req, ctx.res, authOptions);
 
-export const getServerSideProps = async () => {
+    // If user is logged in then redirect to dashboard
+    // If not then redirect the user to the signin page for login
+    if (session) {
+        return {
+            redirect: {
+                destination: "/dashboard",
+            }
+        };
+    } else {
+        return {
+            redirect: {
+                destination: "/login",
+            }
+        };
+    }
+}
 
-  try {
-    await connectDB();
-    console.log('CONNECTED TO MONGO!');
-
-    const users = await User.find({}).sort({ name: 1 }).lean();
-    const projects = await Project.find({}).sort({ name: -1 }).lean();
-    const loggings = await Logging.find({}).limit(50).sort({ createdAt: -1 });
-    const tasks = await Task.find({}).limit(30);
-    // console.log("Fetched Loggings", loggings)
-    // console.log("Fetched Loggings", tasks)
-    // console.log('Fetched Projects!', projects);
-
-    return {
-      props: {
-        users: JSON.parse(JSON.stringify(users)),
-        projects: JSON.parse(JSON.stringify(projects)),
-        loggings: JSON.parse(JSON.stringify(loggings)),
-        tasks: JSON.parse(JSON.stringify(tasks))
-      },
-    };
-
-  } catch (error) {
-    console.log(error);
-    return {
-      notFound: true,
-    };
-  }
-};
-
-export default function Home({ users, projects, loggings, tasks }) {
-
-  return <>
-    <Head>
-      <title>Redbooth + Clockify Integration</title>
-    </Head>
-
-    <div className="px-12 ">
-      {/* month=6&year=2023&invoice=1&userId=6237218 */}
-      
-      <h1 className="text-center text-3xl my-4 " ><span className="text-red-400">Redbooth</span> + <span className="text-blue-400">Clockify</span></h1>
-      <Link href='/single' className="text-2xl font-semibold text-green-500">
-        Generate Invoice
-      </Link>
-      <div className="flex flex-col items-center">
-        <div className="flex justify-center">
-          <div className="border-t border-b border-r border-l border-slate-300 pr-16 pl-10 py-7 bg-gray-50 ">
-            <h1 className="text-3xl font-bold text-red-500">{users.length} People</h1>
-            <div className="my-6 font-normal text-xl ">
-              {users.map((user, index) => (
-                <li key={index} className="list-none my-2 text-blue-600">{user.name}</li>
-              ))}
-            </div>
-          </div>
-
-          <div className="border-t border-b border-slate-300 pr-4 pl-10 py-7 bg-gray-50">
-            <h1 className="text-3xl font-bold text-red-500">Tasks (30)</h1>
-            <div className="my-6 font-normal text-xl">
-              {tasks.map((task, index) => (
-                <li key={index} className="list-none my-2 text-blue-600">{task.name}</li>
-              ))}
-
-            </div>
-          </div>
-
-          <div className="border-t border-l border-r border-b border-slate-300 pr-10 pl-10 py-7 bg-gray-50 text-gray-600 ">
-            <h1 className="text-3xl font-bold text-red-500">User Emails</h1>
-            <div className="my-6 font-normal text-xl text-blue-800">
-              {users.map((user, index) => (
-                <li key={index} className="list-none my-2 text-blue-600">{user.email}</li>
-              ))}
-            </div>
-          </div>
-
-        </div>
-
-        <div className="flex justify-center">
-          <div className="border-b border-l border-slate-300 pr-36 pl-10 py-7 bg-gray-50 text-3xl font-bold text-red-500">Loggings
-            <div className="my-6 font-normal text-xl text-blue-800">
-              {loggings.map((log, index) => (
-                <li key={index} className="list-none text-blue-600 inline-block p-5">{Math.floor(log.minutes / 60)}H</li>
-              ))}
-            </div>
-          </div>
-          {/* <div className="border-b border-r border-l border-slate-300 pr-36 pl-10 py-7 bg-gray-50">Projects <div className="my-2 text-5xl font-light text-green-600">123</div></div>
-          <div className="border-b  border-r border-slate-300 pr-36 pl-10 py-7 bg-gray-50">User <div className="my-2 text-5xl font-light text-green-600">123</div></div> */}
-        </div>
-      </div>
-    </div>
-
-  </>
+/**
+ * Our default root index page component function
+ * 
+ * @param {*} props
+ * @returns 
+ */
+export default function Index() {
+    return <div></div>;
 }
