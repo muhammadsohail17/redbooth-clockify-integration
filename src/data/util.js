@@ -169,8 +169,26 @@ const generateInvoiceData = async (month, year, userId, hourlyRate, invoiceNo, c
     return data;
 }
 
+const generatePdfInvoice = async (invoiceData) => {
+    const browser = await puppeteer.launch({headless: "new"});
+    const page = await browser.newPage();
+    await page.setContent(invoiceData.renderedInvoiceTemplate, { waitUntil: 'domcontentloaded'});
+    // To reflect CSS used for screens instead of print
+    await page.emulateMediaType('screen');
+    //await page.screenshot({path: "canvas.png"})
+    var invoiceFile = `./invoices/${invoiceData.invoiceNo} - ${invoiceData.name} - ${invoiceData.invoiceDate}.pdf`;
+    let height = await page.evaluate(() => document.documentElement.offsetHeight);
+    await page.pdf({
+        path: invoiceFile, 
+        height: height + 'px'
+    });
+    await browser.close();
+    return invoiceFile;
+}
+
 module.exports = {
     generateInvoiceData,
+    generatePdfInvoice,
     toHoursAndMinutes,
     getLastSundayOfMonth,
     getWeeklyRanges,

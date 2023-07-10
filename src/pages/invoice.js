@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import React, { useState } from 'react'
-import { generateInvoiceData } from '@/data/util';
+import { generateInvoiceData, generatePdfInvoice } from '@/data/util';
 import { getSession } from 'next-auth/react';
 
 export async function getServerSideProps(ctx) {
@@ -56,18 +56,16 @@ export default function Invoice({ data, user }) {
                                     <td className="text-md text-black text-right"> {data.invoiceDate} </td>
                                 </tr>
                                 <tr>
-                                    <td className="text-md text-md font-semibold text-black">
-                                        {data.companyName}
-                                    </td>
+                                    <td className="text-md text-md font-semibold text-black">{data.companyName.toUpperCase()}</td>
                                     <td className="text-md text-gray-500 text-right">Due Date:</td>
-                                    <td className="text-md text-black text-right"> {data.invoiceDueDate} </td>
+                                    <td className="text-md text-black text-right">{data.invoiceDueDate}</td>
                                 </tr>
                                 <tr>
-                                    <td className="text-md"> {data.companyAddress} </td>
+                                    <td className="text-md ">{data.companyAddress.toUpperCase()}</td>
                                     <td className="text-md font-semibold text-black text-right">
                                         Balance Due:
                                     </td>
-                                    <td className="text-md font-semibold text-black text-right"> {data.currency}  {data.monthlyTotals} </td>
+                                    <td className="text-md font-semibold text-black text-right">{data.currency} {data.monthlyTotals} </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -75,20 +73,19 @@ export default function Invoice({ data, user }) {
                     <div className="border border-gray-400 rounded-lg mt-10">
                         <table className="w-full text-sm text-left text-gray-500">
                             <thead className="text-xs text-gray-700 uppercase">
-                                <tr className="border-b border-gray-400">
-                                    <th className="px-6 py-3 w-full">Project</th>
-                                    <th className="px-6 py-3">Hours</th>
-                                    <th className="px-6 py-3">Rate</th>
-                                    <th className="px-6 py-3">Amount</th>
+                                <tr className="border-b border-gray-400 ">
+                                    <th className="px-6 py-3 w-full text-white bg-[#232e38] rounded-tl-[7px]">Project</th>
+                                    <th className="px-6 py-3 text-white bg-[#232e38]">Hours</th>
+                                    <th className="px-6 py-3 text-white bg-[#232e38]">Rate</th>
+                                    <th className="px-6 py-3 text-white bg-[#232e38] rounded-tr-[7px]">Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {data.loggingsData.map(project => (
-                                    <>
+                                {data.loggingsData.map((project, index) => (
+                                    <React.Fragment key={index}>
 
-                                        {project.projectLoggingsData.map(weeklyLogging => (
-
-                                            <tr className="border-b border-gray-400">
+                                        {project.projectLoggingsData.map((weeklyLogging, index) => (
+                                            <tr className={`border-b ${!data.customItems && index === project.projectLoggingsData.length - 1 ? 'border-transparent' : 'border-gray-400'}`} key={index}>
                                                 <td className="px-6 py-4 text-black"> {project.name}  - Work done from  {weeklyLogging.range}</td>
                                                 <td className="px-6 py-4 text-black whitespace-nowrap"> {weeklyLogging.weeklyTotalLoggedHours} </td>
                                                 <td className="px-6 py-4 text-black whitespace-nowrap"> {data.currency}  {data.hourlyRate} </td>
@@ -96,17 +93,20 @@ export default function Invoice({ data, user }) {
                                             </tr>
                                         ))}
 
-                                    </>
+                                    </React.Fragment>
                                 ))}
-                                {/* {data.customItems && data.customItems.length ?
-                                    data.customItems.map(cI => (
-                                        <tr className="border-b border-gray-400">
-                                            <td className="px-6 py-4 text-black"> {cI.item} </td>
-                                            <td className="px-6 py-4 text-black whitespace-nowrap"></td>
-                                            <td className="px-6 py-4 text-black whitespace-nowrap"></td>
-                                            <td className="px-6 py-4 text-black whitespace-nowrap"> {data.currency}  {cI.value} </td>
-                                        </tr>
-                                    )) : ''} */}
+                                    
+                                {data.customItems && data.customItems.length ?
+                                    data.customItems.map((cI, index) => (
+                                      
+
+                                <tr className={`border-b ${index === data.customItems.length - 1 ? 'border-transparent' : 'border-gray-400'}`} key={index}>
+                                    <td className="px-6 py-4 text-black"> {cI.item} </td>
+                                    <td className="px-6 py-4 text-black whitespace-nowrap"></td>
+                                    <td className="px-6 py-4 text-black whitespace-nowrap"></td>
+                                    <td className="px-6 py-4 text-black whitespace-nowrap"> {data.currency}  {cI.value} </td>
+                                </tr>
+                                    )) : ''}
                             </tbody>
                         </table>
                     </div>

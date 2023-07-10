@@ -23,10 +23,10 @@ export default function Dashboard({ projects, userData, userLoggings, data }) {
                     </span>
 
                 </div>
-                {/* {projects.map((project, id) => ( */}
-                <h1 className='text-white text-2xl'>Project Name</h1>
+                {projects.map((project, id) => (
+                <h1 key={id} className='text-white text-2xl'>{project.name}</h1>
 
-                {/* ))} */}
+                ))}
 
 
             </div>
