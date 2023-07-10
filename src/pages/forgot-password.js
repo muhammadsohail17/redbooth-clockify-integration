@@ -5,11 +5,12 @@ import { registerUser } from "@/data/dataModel";
 import Router from "next/router";
 
 export async function getServerSideProps(ctx) {
-    const { token, reset, email } = ctx.query;
+
+    const { token, email } = ctx.query;
     let resetPassword = false;
     let emailForReset = null; // Assign a default value of null
 
-    if (token && reset) {
+    if (token) {
         const user = await registerUser.findOne({ verificationToken: token });
         if (user) {
             resetPassword = true;
@@ -48,8 +49,6 @@ export default function sendLink({ resetPassword, emailForReset }) {
             console.log(message)
         } catch (error) {
             console.log(error); // Log the error on the frontend
-            setMessage({ status: 0, text: error.response.data })
-            console.log(message)
             // Pass the error back to the backend
             // axios.post('/api/error', { error: error.message });
         }
@@ -113,8 +112,8 @@ export default function sendLink({ resetPassword, emailForReset }) {
                         </form>
                     </div> : <div> {
                         message.status == 1 ? <div><h4 className="font-serif mb-4 text-5xl text-white tracking-tighter">Reset Link Sent!</h4>
-                            `<p className="mb-7 text-xl text-white tracking-tight">We just sent you an email to <strong>{email}</strong> so you can retrieve your password.</p>`
-                            <p className="mb-7 text-xl text-white tracking-tight">Follow the link inside the email to log in to Redbooth and clockify integration! If you can't find the email, look in the spam folder.</p></div>
+                            `<p className="mb-7 text-xl text-white tracking-tight">If the email address <strong>{email}</strong> is registered, an email will be sent to you with instructions on how to retrieve your password.</p>`
+                            <p className="mb-7 text-xl text-white tracking-tight">Additionally, please remember to check your spam folder if you can't locate the email. Once you receive it, simply follow the link provided in the email to log in to the Redbooth and Clockify integration.</p></div>
                             : <div><h2 className="font-serif mb-4 text-6xl text-white tracking-tighter">Have You Forgotten Your Password?</h2>
                                 <p className="mb-7 text-xl text-white tracking-tight">Redbooth and Clockify integration.</p>
                                 <div className=" p-px bg-transparent overflow-hidden rounded-lg">
@@ -122,16 +121,6 @@ export default function sendLink({ resetPassword, emailForReset }) {
                                 </div>
                                 <form onSubmit={handleFormSubmit}  >
                                     <div className="w-full md:w-1/2 p-3">
-                                        {message ? (
-                                            <div
-                                                className={`flex items-center ${message.status == 0 && 'bg-red-500'} text-white text-sm font-bold px-4 py-3 mb-2`}
-                                                role='alert'
-                                            >
-                                                <p>{`${message.status == 0 ? message.text.error : ""}`}</p>
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
                                         <label className="block">
                                             <div className="mb-2 text-white font-semibold">
                                                 <span>
