@@ -37,15 +37,15 @@ export default function signup() {
         <Head>
             <title>Redbooth + Clockify Integration</title>
         </Head>
-        <section className="py-24 lg:py-28 bg-cyan-600 h-screen overflow-hidden">
+        <section className="py-24 lg:py-28 bg-gray-200 h-screen overflow-hidden">
             <div className="container px-4 mx-auto">
                 <div className="max-w-3xl mx-auto">
-                    {message.status == 1 ? <h2 className="font-heading mb-4 text-6xl text-white tracking-tighter">Registration Successful!</h2>
-                        : <h2 className="font-heading mb-4 text-6xl text-white tracking-tighter">Create a free account</h2>}
-                    <p className=" text-xl text-white tracking-tight">Redbooth and Clockify integration.</p>
+                    {message.status == 1 ? <h2 className="font-heading mb-4 text-6xl text-black tracking-tighter">Registration Successful!</h2>
+                        : <h2 className="font-heading mb-4 text-6xl text-black tracking-tighter">Create a free account</h2>}
+                    <p className=" text-xl text-black tracking-tight">Redbooth and Clockify integration.</p>
                     {message ? (
                         <div
-                            className={`flex items-center ${message.status == 0 && 'bg-red-500'} text-white text-sm font-bold px-4 py-3 mb-2`}
+                            className={`flex items-center ${message.status == 0 && 'bg-red-500'} text-black text-sm font-bold px-4 py-3 mb-2`}
                             role='alert'
                         >
                             <p>{`${message.status == 0 ? message.text : ""}`}</p>
@@ -53,7 +53,12 @@ export default function signup() {
                     ) : (
                         ''
                     )}
-                    {message.status == 1 ? <p className="mb-5 text-xl text-white tracking-tight">Please check your email to verify your account.</p>
+                    {message.status == 1 ? <div><p className="mb-5 text-xl text-black tracking-tight">We kindly request you to check your email in order to verify your account.</p>
+                        <p className="mb-5 text-xl text-black tracking-tight">Thank you for creating an account with us! Verifying your account will enable you to access all the features and benefits our platform offers.</p>
+                        <p className="mb-5 text-xl text-black tracking-tight">If you cannot locate the verification email in your inbox, please take a moment to check your spam folder as well.</p>
+                        <p className="mb-5 text-xl text-black tracking-tight">Should you encounter any difficulties or have any questions, please don't hesitate to reach out to our support team. We are here to assist you every step of the way.</p>
+                        <p className="mb-5 text-xl text-black tracking-tight">Once again, we appreciate your choice to join our platform. We look forward to serving you!</p>
+                    </div>
                         : <form onSubmit={handleSubmit} id="registerForm" className="flex flex-wrap -m-3">
                             <div className="w-full md:w-1/2 p-3">
                                 <label className="block">
@@ -77,7 +82,7 @@ export default function signup() {
                             </div>
                             <div className="w-full p-3">
                                 <button type="submit" className="inline-block mb-7 px-5 py-4 w-full text-white text-center font-semibold tracking-tight bg-indigo-500 hover:bg-indigo-600 rounded-lg focus:ring-4 focus:ring-indigo-300 transition duration-200" href="#">Create Free Account</button>
-                                <span className="font-medium text-white tracking-tight">
+                                <span className="font-medium text-black tracking-tight">
                                     <span>Already have an account?</span>
                                     <a className="text-red-500 hover:text-red-700 transition duration-200 ml-2" href="/login">Sign In</a>
                                 </span>

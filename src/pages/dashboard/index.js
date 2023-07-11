@@ -14,12 +14,8 @@ export async function getServerSideProps(ctx) {
     if (session) {
         try {
             await connectDB();
-            // console.log("Index!", session.user.email)
-
+            console.log("Index!", session.user.email)
             const user = await User.findOne({ email: session.user.email }).lean();
-
-            console.log("user", user)
-
             //get rbUserId as userId from user object
             const { rbUserId: userId } = user;
             // get all time user loggings
@@ -37,10 +33,6 @@ export async function getServerSideProps(ctx) {
                 const project = projects.find(project => project.rbProjectId === task.rbProjectId);
                 return { ...logging, task, project };
             });
-
-
-            console.log(projects)
-
             // const loggingsWithTasks = userLoggings.map(logging => {
             //     const task = userTasks.find(task => task.rbTaskId === logging.rbTaskId);
             //     return { ...logging, task };
@@ -80,7 +72,7 @@ export async function getServerSideProps(ctx) {
 }
 
 export default function Home({ projects, loggingsWithTasksAndProjects, userLoggings, data }) {
-    console.log(loggingsWithTasksAndProjects);
+    // console.log(loggingsWithTasksAndProjects);
 
     return <>
         <Head>

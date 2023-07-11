@@ -56,8 +56,6 @@ export default function sendLink({ resetPassword, emailForReset }) {
 
     const handlePasswordSubmit = async (e) => {
         e.preventDefault();
-        console.log(password, confirmPassword);
-
         try {
             const result = await axios.post('/api/resetPassword', { password, confirmPassword, emailForReset })
             console.log(result)
@@ -79,16 +77,16 @@ export default function sendLink({ resetPassword, emailForReset }) {
         <Head>
             <title>Redbooth + Clockify Integration</title>
         </Head>
-        <section className="py-24 lg:py-28 bg-cyan-600 h-screen overflow-hidden">
+        <section className="py-24 lg:py-28 bg-gray-200 h-screen overflow-hidden">
             <div className="container px-4 mx-auto">
                 <div className="max-w-3xl mx-auto">
                     {resetPassword ? <div>
-                        <h2 className="font-serif m-2 text-4xl text-white tracking-tighter">Choose a new password</h2>
+                        <h2 className="font-serif m-2 text-4xl text-black tracking-tighter">Choose a new password</h2>
                         <form onSubmit={handlePasswordSubmit}>
                             <div className="w-full md:w-1/2 p-3">
                                 {message ? (
                                     <div
-                                        className={`flex items-center ${message.status == 0 && 'bg-red-500'} text-white text-sm font-bold px-4 py-3 mb-2`}
+                                        className={`flex items-center ${message.status == 0 && 'bg-red-500'} text-black text-sm font-bold px-4 py-3 mb-2`}
                                         role='alert'
                                     >
                                         <p>{`${message.status == 0 ? message.text : ""}`}</p>
@@ -111,18 +109,18 @@ export default function sendLink({ resetPassword, emailForReset }) {
                             </div>
                         </form>
                     </div> : <div> {
-                        message.status == 1 ? <div><h4 className="font-serif mb-4 text-5xl text-white tracking-tighter">Reset Link Sent!</h4>
-                            `<p className="mb-7 text-xl text-white tracking-tight">If the email address <strong>{email}</strong> is registered, an email will be sent to you with instructions on how to retrieve your password.</p>`
-                            <p className="mb-7 text-xl text-white tracking-tight">Additionally, please remember to check your spam folder if you can't locate the email. Once you receive it, simply follow the link provided in the email to log in to the Redbooth and Clockify integration.</p></div>
-                            : <div><h2 className="font-serif mb-4 text-6xl text-white tracking-tighter">Have You Forgotten Your Password?</h2>
-                                <p className="mb-7 text-xl text-white tracking-tight">Redbooth and Clockify integration.</p>
+                        message.status == 1 ? <div><h4 className="font-serif mb-4 text-5xl text-black tracking-tighter">Reset Link Sent!</h4>
+                            `<p className="mb-7 text-xl text-black tracking-tight">If the email address <strong>{email}</strong> is registered, an email will be sent to you with instructions on how to retrieve your password.</p>`
+                            <p className="mb-7 text-xl text-black tracking-tight">Additionally, please remember to check your spam folder if you can't locate the email. Once you receive it, simply follow the link provided in the email to log in to the Redbooth and Clockify integration.</p></div>
+                            : <div><h2 className="font-serif mb-4 text-6xl text-black tracking-tighter">Have You Forgotten Your Password?</h2>
+                                <p className="mb-7 text-xl text-black tracking-tight">Redbooth and Clockify integration.</p>
                                 <div className=" p-px bg-transparent overflow-hidden rounded-lg">
-                                    <p className="text-white transition duration-200 ml-2">We can send you a link to reset it.</p>
+                                    <p className="text-black transition duration-200 ml-2">We can send you a link to reset it.</p>
                                 </div>
                                 <form onSubmit={handleFormSubmit}  >
                                     <div className="w-full md:w-1/2 p-3">
                                         <label className="block">
-                                            <div className="mb-2 text-white font-semibold">
+                                            <div className="mb-2 text-black font-semibold">
                                                 <span>
                                                     Email
                                                 </span>

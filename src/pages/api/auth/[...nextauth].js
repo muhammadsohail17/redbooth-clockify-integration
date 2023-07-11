@@ -73,6 +73,8 @@ export const authOptions = {
   callbacks: {
     async session({ session, token }) {
 
+      await connectDB()
+
       const dbUser = await registerUser.findOne({ email: token.email });
       // Send properties to the client, like an access_token and user id from a provider.
       session.user.id = dbUser._id.$oid;

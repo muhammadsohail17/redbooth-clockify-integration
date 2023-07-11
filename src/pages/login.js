@@ -48,7 +48,6 @@ export default function signin({ autoFillEmail }) {
         } else if (result.status == 401) {
             setMessage({ status: 0, text: "Invalid email or password!" })
         }
-        console.log(message)
     }
 
 
@@ -58,11 +57,11 @@ export default function signin({ autoFillEmail }) {
         <Head>
             <title>Redbooth + Clockify Integration</title>
         </Head>
-        <section className="py-24 lg:py-28 bg-cyan-600 h-screen overflow-hidden">
+        <section className="py-24 lg:py-28 bg-gray-200 h-screen overflow-hidden">
             <div className="container px-4 mx-auto">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="font-heading mb-4 text-6xl text-white tracking-tighter">Sign In</h2>
-                    <p className="mb-10 text-xl text-white tracking-tight">Redbooth and Clockify integration.</p>
+                    <h2 className="font-heading mb-4 text-6xl text-black tracking-tighter">Sign In</h2>
+                    <p className="mb-10 text-xl text-black tracking-tight">Redbooth and Clockify integration.</p>
                     {message ? (
                         <div
                             className={`flex items-center ${message.status == 0 && 'bg-red-500'} text-white text-sm font-bold px-4 py-3 mb-2`}
@@ -95,7 +94,7 @@ export default function signin({ autoFillEmail }) {
                         </div>
                         <div className="w-full p-3">
                             <button type="submit" className="inline-block mb-7 px-5 py-4 w-full text-white text-center font-semibold border border-gray-600 tracking-tight bg-indigo-500 hover:bg-indigo-600 rounded-lg focus:ring-4 focus:ring-indigo-300 transition duration-200">Login</button>
-                            <span className="font-medium text-white tracking-tight">
+                            <span className="font-medium text-black tracking-tight">
                                 <span>Don't have an account?</span>
                                 <a className="text-red-500 hover:text-red-700 transition duration-200 ml-2" href="/signup">Register Here</a>
                             </span>

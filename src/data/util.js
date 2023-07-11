@@ -74,7 +74,7 @@ const generateInvoiceData = async (month, year, userId, hourlyRate, invoiceNo, c
     const weeklyRanges = getWeeklyRanges(startDate, endDate);
     const projects = await Project.find().lean();
     const user = await User.findOne({ rbUserId: userId }, { password: 0 }).lean();
-    console.log('User', user)
+    // console.log('User', user)
     const loggings = await Logging.find({ rbUserId: userId }).sort({ createdAt: 'desc' }).exec();
 
     var totalLoggedHours = 0;
@@ -170,16 +170,16 @@ const generateInvoiceData = async (month, year, userId, hourlyRate, invoiceNo, c
 }
 
 const generatePdfInvoice = async (invoiceData) => {
-    const browser = await puppeteer.launch({headless: "new"});
+    const browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
-    await page.setContent(invoiceData.renderedInvoiceTemplate, { waitUntil: 'domcontentloaded'});
+    await page.setContent(invoiceData.renderedInvoiceTemplate, { waitUntil: 'domcontentloaded' });
     // To reflect CSS used for screens instead of print
     await page.emulateMediaType('screen');
     //await page.screenshot({path: "canvas.png"})
     var invoiceFile = `./invoices/${invoiceData.invoiceNo} - ${invoiceData.name} - ${invoiceData.invoiceDate}.pdf`;
     let height = await page.evaluate(() => document.documentElement.offsetHeight);
     await page.pdf({
-        path: invoiceFile, 
+        path: invoiceFile,
         height: height + 'px'
     });
     await browser.close();

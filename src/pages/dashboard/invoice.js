@@ -1,13 +1,13 @@
 import Head from 'next/head'
 import React, { useState } from 'react'
-import { generateInvoiceData, generatePdfInvoice } from '@/data/util';
-import { getSession } from 'next-auth/react';
+import { generateInvoiceData, generatePdfInvoice } from '../../data/util';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
 export async function getServerSideProps(ctx) {
-    const { User } = require('../data/dataModel');
+    const { User } = require('../../data/dataModel');
 
-    const { req } = ctx;
-    const session = await getSession({ req })
+    const session = await getServerSession(ctx.req, ctx.res, authOptions);
     const user = await User.findOne({ email: session.user.email }).lean();
     console.log('User Inside invoice', user)
 
@@ -95,17 +95,17 @@ export default function Invoice({ data, user }) {
 
                                     </React.Fragment>
                                 ))}
-                                    
+
                                 {data.customItems && data.customItems.length ?
                                     data.customItems.map((cI, index) => (
-                                      
 
-                                <tr className={`border-b ${index === data.customItems.length - 1 ? 'border-transparent' : 'border-gray-400'}`} key={index}>
-                                    <td className="px-6 py-4 text-black"> {cI.item} </td>
-                                    <td className="px-6 py-4 text-black whitespace-nowrap"></td>
-                                    <td className="px-6 py-4 text-black whitespace-nowrap"></td>
-                                    <td className="px-6 py-4 text-black whitespace-nowrap"> {data.currency}  {cI.value} </td>
-                                </tr>
+
+                                        <tr className={`border-b ${index === data.customItems.length - 1 ? 'border-transparent' : 'border-gray-400'}`} key={index}>
+                                            <td className="px-6 py-4 text-black"> {cI.item} </td>
+                                            <td className="px-6 py-4 text-black whitespace-nowrap"></td>
+                                            <td className="px-6 py-4 text-black whitespace-nowrap"></td>
+                                            <td className="px-6 py-4 text-black whitespace-nowrap"> {data.currency}  {cI.value} </td>
+                                        </tr>
                                     )) : ''}
                             </tbody>
                         </table>

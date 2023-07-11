@@ -1,10 +1,10 @@
 import React from 'react'
 import Link from 'next/link'
-import { getSession, signIn } from 'next-auth/react'
-import { signOut } from "next-auth/react"
-import { unixTimestampToDate } from '@/data/util'
+import { unixTimestampToDate } from '../data/util'
 
 export default function Dashboard({ projects, userData, userLoggings, data }) {
+
+    // console.log(projects)
     return <>
         {/* {console.log('Dashboard', data.loggingsData)} */}
         <div className="flex overflow-x-hidden min-h-screen">
@@ -15,16 +15,17 @@ export default function Dashboard({ projects, userData, userLoggings, data }) {
                 </svg>
                 <div className="my-2">
                     <h1 className="text-2xl font-bold text-white inline">Welcome {data.name}!</h1>
-
-                    <span className='' onClick={() => signOut()}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-9 ml-3 mb-4 inline text-white  hover:text-red-400 cursor-pointer fixed bottom-0 left-0">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
-                        </svg>
-                    </span>
+                    <Link href="api/auth/signout">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-9 ml-3 mb-4 inline text-white  hover:text-red-400 cursor-pointer fixed bottom-0 left-0">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                            </svg>
+                        </span>
+                    </Link>
 
                 </div>
                 {projects.map((project, id) => (
-                <h1 key={id} className='text-white text-2xl'>{project.name}</h1>
+                    <h1 key={id} className='text-white text-2xl'>{project.name}</h1>
 
                 ))}
 
@@ -32,7 +33,7 @@ export default function Dashboard({ projects, userData, userLoggings, data }) {
             </div>
             <div className="w-full px-4 py-2 bg-gray-200 lg:w-full">
                 <div className="container mx-auto mt-14">
-                    <Link href="/generateInvoice">
+                    <Link href="/dashboard/generateInvoice">
                         <button className='bg-blue-600 px-2 py-2 text-white rounded-lg hover:bg-blue-700 mb-3 absolute right-2.5 top-1 mt-2'>Generate Invoice</button>
                     </Link>
                     <div className="grid gap-4 lg:grid-cols-2">
@@ -118,7 +119,7 @@ export default function Dashboard({ projects, userData, userLoggings, data }) {
                                                                 {weeklyLogging.weeklyTotalLoggedHours}
                                                             </span>
                                                         </td>
-                                                      
+
                                                     </tr>
                                                 ))}
                                             </>
