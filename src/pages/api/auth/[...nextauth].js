@@ -1,9 +1,12 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import mongoose from 'mongoose';
-import connectDB from '@/data/db';
+import { registerUser } from "../../../data/dataModel";
+import connectDB from "../../../data/db";
+import bcrypt from "bcrypt";
 
-export default NextAuth({
+// const uri = process.env.MONGODB_URI;
+
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -16,30 +19,49 @@ export default NextAuth({
         const { email, password } = credentials;
 
         try {
-          await connectDB();
-          // Define your user schema and model using Mongoose
-          const User = mongoose.models.users || mongoose.model('users', {
-            rbUserId: Number,
-            name: String,
-            username: String,
-            email: String,
-            password: String,
-            status: Boolean
-          });
+          await connectDB()
 
-          // Query the user collection for the provided email
-          const user = await User.findOne({ email });
-          console.log(user);
+          const user = await registerUser.findOne({ email });
 
-          if (user && password === user.password) {
-            // If the user is found and the password matches, return the user object
-            console.log('User authenticated!');
-            return user;
+          if (user) {
+            // User found, compare the provided password with the stored hashed password
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+
+            if (isPasswordValid) {
+              // Passwords match, user is authenticated
+
+              if (user.isVerified == true) {
+                console.log('User authenticated!');
+                console.log(user);
+                return {
+                  id: user._id.$oid,
+                  email: user.email
+                };
+              } else {
+                console.log("You haven't verified your account yet!")
+                return null;
+              }
+
+            } else {
+              // Passwords do not match
+              console.log('password incorrect!');
+              return null;
+            }
           } else {
-            // If the user is not found or the password is incorrect, return null
-            console.log('User failed!');
+            // User not found
+            console.log("user not found!")
             return null;
           }
+
+          // if (user && password === user.password) {
+          //   // If the user is found and the password matches, return the user object
+          //   console.log('User authenticated!');
+          //   return user;
+          // } else {
+          //   // If the user is not found or the password is incorrect, return null
+          //   console.log('User failed!');
+          //   return null;
+          // }
         } catch (error) {
           // Handle error connecting to MongoDB or during authentication
           console.error('Error:', error);
@@ -48,9 +70,34 @@ export default NextAuth({
       },
     }),
   ],
-  session: {
-    // Set the session expiration time to 1 hour (3600 seconds)
-    maxAge: 604800,
-  },
-});
+  callbacks: {
+    async session({ session, token }) {
 
+      await connectDB()
+
+      const dbUser = await registerUser.findOne({ email: token.email });
+      // Send properties to the client, like an access_token and user id from a provider.
+      session.user.id = dbUser._id.$oid;
+      return session
+    }
+  },
+  pages: {
+    signIn: '/signin'
+  }
+}
+
+export default NextAuth(authOptions);
+
+// export async function connectToDatabase() {
+//   const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+//   try {
+//     // Connect to the MongoDB database
+//     await client.connect();
+//     console.log('Connected to MongoDB');
+//     return client;
+//   } catch (error) {
+//     console.error('Error connecting to MongoDB:', error);
+//     throw error;
+//   }
+// }

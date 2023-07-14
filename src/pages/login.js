@@ -1,147 +1,107 @@
-import { useState } from 'react'
-import { getSession, signIn } from 'next-auth/react'
-import Head from 'next/head'
+import Head from "next/head";
+import { signIn } from 'next-auth/react'
+import { useState } from "react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import Router from 'next/router'
+import Link from "next/link";
 
-export async function getServerSideProps({ req }) {
-    // Get user session from the request headers
-    const session = await getSession({ req })
-    // console.log(session)
+
+
+export const getServerSideProps = async (ctx) => {
+
+    var autoFillEmail = ctx.query.email ? ctx.query.email : null;
+    const session = await getServerSession(ctx.req, ctx.res, authOptions);
+
     if (session) {
         return {
             redirect: {
-                destination: '/'
+                destination: '/dashboard'
             },
             props: {}
         }
     } else {
         return {
-            props: {}
+            props: { autoFillEmail }
         }
     }
-}
+};
 
-const LoginPage = () => {
-    const [email, setEmail] = useState('')
+
+export default function signin({ autoFillEmail }) {
+    const [email, setEmail] = useState(autoFillEmail)
     const [password, setPassword] = useState('')
+    const [message, setMessage] = useState({ status: null, text: '' });
 
-    const handleSubmit = (e) => {
+
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        signIn('credentials', {
+        const result = await signIn('credentials', {
             email,
             password,
-            redirect: '/' // Do not redirect, handle the response manually
+            redirect: false // Do not redirect, handle the response manually
         })
-            .then((response) => {
-                // Handle success or error response
-                console.log(response)
-            })
-            .catch((error) => {
-                // Handle error
-                console.error(error.error)
-            })
+
+        console.log(result);
+        if (result.ok) {
+            Router.replace('/dashboard')
+        } else if (result.status == 401) {
+            setMessage({ status: 0, text: "Invalid email or password!" })
+        }
     }
 
-    return (
-        <div className='min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8'>
-            <Head>
-                <title>Log In</title>
-            </Head>
-            <div className='max-w-md w-full space-y-8'>
-                <div>
-                    <h2 className='mt-6 text-center text-3xl font-extrabold text-gray-900'>
-                        Log in to your account
-                    </h2>
-                </div>
-                <form className='mt-8 space-y-6' onSubmit={handleSubmit}>
-                    <input type='hidden' name='remember' defaultValue='true' />
-                    <div className='rounded-md shadow-sm -space-y-px'>
-                        <div>
-                            <label htmlFor='email-address' className='sr-only'>
-                                Email address
-                            </label>
-                            <input
-                                id='email-address'
-                                name='email'
-                                type='email'
-                                autoComplete='email'
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
-                                placeholder='Email address'
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor='password' className='sr-only'>
-                                Password
-                            </label>
-                            <input
-                                id='password'
-                                name='password'
-                                type='password'
-                                autoComplete='current-password'
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
-                                placeholder='Password'
-                            />
-                        </div>
-                    </div>
 
-                    <div className='flex items-center justify-between'>
-                        <div className='flex items-center'>
-                            <input
-                                id='remember-me'
-                                name='remember-me'
-                                type='checkbox'
-                                className='h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded'
-                            />
-                            <label
-                                htmlFor='remember-me'
-                                className='ml-2 block text-sm text-gray-900'
-                            >
-                                Remember me
-                            </label>
-                        </div>
 
-                        <div className='text-sm'>
-                            <a
-                                href='#'
-                                className='font-medium text-indigo-600 hover:text-indigo-500'
-                            >
-                                Forgot your password?
-                            </a>
-                        </div>
-                    </div>
 
-                    <div>
-                        <button
-                            type='submit'
-                            className='group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+    return <>
+        <Head>
+            <title>Redbooth + Clockify Integration</title>
+        </Head>
+        <section className="py-24 lg:py-28 bg-gray-200 h-screen overflow-hidden">
+            <div className="container px-4 mx-auto">
+                <div className="max-w-3xl mx-auto">
+                    <h2 className="font-heading mb-4 text-6xl text-black tracking-tighter">Sign In</h2>
+                    <p className="mb-10 text-xl text-black tracking-tight">Redbooth and Clockify integration.</p>
+                    {message ? (
+                        <div
+                            className={`flex items-center ${message.status == 0 && 'bg-red-500'} text-white text-sm font-bold px-4 py-3 mb-2`}
+                            role='alert'
                         >
-                            <span className='absolute left-0 inset-y-0 flex items-center pl-3'>
-                                <svg
-                                    className='h-5 w-5 text-indigo-500 group-hover:text-indigo-400'
-                                    xmlns='http://www.w3.org/2000/svg'
-                                    viewBox='0 0 20 20'
-                                    fill='currentColor'
-                                    aria-hidden='true'
-                                >
-                                    <path
-                                        fillRule='evenodd'
-                                        d='M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12zm-1-4a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1zm-1-4a1 1 0 011-1h4a1 1 0 010 2h-4a1 1 0 01-1-1z'
-                                        clipRule='evenodd'
-                                    />
-                                </svg>
+                            <p>{`${message.status == 0 ? message.text : ""}`}</p>
+                        </div>
+                    ) : (
+                        ''
+                    )}
+                    <form onSubmit={handleSubmit} className="flex flex-wrap -m-3">
+                        <div className="w-full md:w-1/2 p-3">
+                            <label className="block">
+                                <input defaultValue={autoFillEmail ? autoFillEmail : ''} onChange={(e) => setEmail(e.target.value)} name="email" className="p-4 w-full text-gray-700 tracking-tight bg-white placeholder-light-gray-700 outline-none border border-gray-600 rounded-lg focus:border-indigo-500 transition duration-200" id="email" type="text" placeholder="Email" required />
+                            </label>
+                        </div>
+                        <div className="w-full md:w-1/2 p-3">
+                            <label className="block">
+                                <input onChange={(e) => setPassword(e.target.value)} value={password} name="password" className="p-4 w-full text-gray-700 tracking-tight bg-white placeholder-light-gray-700 outline-none border border-gray-600 rounded-lg focus:border-indigo-500 transition duration-200" id="password" type="password" placeholder="••••••••" required />
+                            </label>
+                        </div>
+                        <div className="flex w-full p-3">
+                            <div className="p-px bg-transparent ml-auto overflow-hidden rounded-lg">
+                                <span className="font-medium text-white tracking-tight">
+                                    <Link className="text-blue-400 hover:underline transition duration-200 ml-2" href="/forgot-password">
+                                        'Forgot password?
+                                    </Link>
+                                </span>
+                            </div>
+                        </div>
+                        <div className="w-full p-3">
+                            <button type="submit" className="inline-block mb-7 px-5 py-4 w-full text-white text-center font-semibold border border-gray-600 tracking-tight bg-indigo-500 hover:bg-indigo-600 rounded-lg focus:ring-4 focus:ring-indigo-300 transition duration-200">Login</button>
+                            <span className="font-medium text-black tracking-tight">
+                                <span>Don't have an account?</span>
+                                <a className="text-red-500 hover:text-red-700 transition duration-200 ml-2" href="/signup">Register Here</a>
                             </span>
-                            Sign in
-                        </button>
-                    </div>
-                </form>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
-    )
+        </section>
+    </>
 }
-
-export default LoginPage

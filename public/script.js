@@ -24,10 +24,10 @@ $(document).on('click', '.addCustomItem', function (e) {
     );
 });
 
-
-
-
-
 $(document).on('click', '.removeCustomItem', function (e) {
     $(this).parents('.customItem').remove();
 });
+
+// $(document).ready(function () {
+//     $('#monthSelect').val((new Date().getMonth() + 1).toString());
+// });

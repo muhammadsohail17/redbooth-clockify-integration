@@ -1,88 +1,42 @@
-import Head from 'next/head'
-import Link from 'next/link'
-import React from 'react'
-import connectDB from '@/data/db'
-import Dashboard from '@/components/Dashboard'
-import { getSession, signIn } from 'next-auth/react'
-import { generateInvoiceData } from '@/data/util'
-export async function getServerSideProps({ req }) {
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+/**
+ * Server side props function runs on serverside
+ * Checks whether the user is logged in or not and takes appropriate action
+ * 
+ * This is our root index page which redirects the user to appropriate link
+ * This file will be executed if someone visits the app url without mentioning any specific path in there
+ * 
+ * @param {*} param 
+ * @returns 
+ */
+export async function getServerSideProps(ctx) {
+    // Get user session from the request headers
+    const session = await getServerSession(ctx.req, ctx.res, authOptions);
 
-    const { User, Project, Task, Logging } = require('../data/dataModel')
-    const session = await getSession({ req })
-
+    // If user is logged in then redirect to dashboard
+    // If not then redirect the user to the signin page for login
     if (session) {
-        try {
-            await connectDB();
-            // console.log("Index!", session.user.email)
-
-            const user = await User.findOne({ email: session.user.email }).lean();
-            //get rbUserId as userId from user object
-            const { rbUserId: userId } = user;
-            // get all time user loggings
-            const userLoggings = await Logging.find({ rbUserId: 6237218 }).sort({ rbCommentId: -1 }).limit(10).lean();
-            const taskIds = userLoggings.map(logging => logging.rbTaskId);
-            // Creates an array of taskIds by extracting the rbTaskId property from each object in the userLoggings array
-            const userTasks = await Task.find({ rbTaskId: { $in: taskIds } });
-            // Finds all tasks where the rbTaskId property is included in the taskIds array and awaits the result
-            const projectIds = userTasks.map(task => task.rbProjectId);
-            // Creates an array of projectIds by extracting the rbProjectId property from each object in the userTasks array
-            const projects = await Project.find({ rbProjectId: { $in: projectIds } }).lean();
-
-            const loggingsWithTasksAndProjects = userLoggings.map(logging => {
-                const task = userTasks.find(task => task.rbTaskId === logging.rbTaskId);
-                const project = projects.find(project => project.rbProjectId === task.rbProjectId);
-                return { ...logging, task, project };
-            });
-
-            // const loggingsWithTasks = userLoggings.map(logging => {
-            //     const task = userTasks.find(task => task.rbTaskId === logging.rbTaskId);
-            //     return { ...logging, task };
-            // });
-            // console.log("loggingsWithTasksAndProjects", loggingsWithTasksAndProjects)
-
-            const currentDate = new Date();
-            const currentMonth = currentDate.getMonth() + 1;
-            const currentYear = currentDate.getFullYear();
-
-            var data = await generateInvoiceData(currentMonth, currentYear, userId);
-            const { loggingsData } = data;
-            const [{ projectLoggingsData }] = loggingsData;
-            const [{ weeklyLoggingsData }] = projectLoggingsData;
-
-            return {
-                props: {
-                    user: JSON.parse(JSON.stringify(user)),
-                    loggingsWithTasksAndProjects: JSON.parse(JSON.stringify(loggingsWithTasksAndProjects)),
-                    projects: JSON.parse(JSON.stringify(projects)),
-                    userLoggings: JSON.parse(JSON.stringify(userLoggings)),
-                    data: JSON.parse(JSON.stringify(data)),
-
-                },
-            };
-        } catch (error) {
-            console.log(error);
-            return {
-                notFound: true,
-            };
-        }
-
+        return {
+            redirect: {
+                destination: "/dashboard",
+            }
+        };
     } else {
         return {
-            redirect: { destination: '/login' },
-            props: {}
-        }
+            redirect: {
+                destination: "/login",
+            }
+        };
     }
 }
 
-export default function Home({ projects, loggingsWithTasksAndProjects, userLoggings, data }) {
-    return <>
-        <Head>
-
-            <title>Dashboard</title>
-        </Head>
-        {/* {console.log('Index', data)} */}
-
-        <Dashboard projects={projects} userData={loggingsWithTasksAndProjects} userLoggings={userLoggings} data={data} />
-
-    </>
+/**
+ * Our default root index page component function
+ * 
+ * @param {*} props
+ * @returns 
+ */
+export default function Index() {
+    return <div></div>;
 }
