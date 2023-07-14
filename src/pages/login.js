@@ -87,7 +87,7 @@ export default function signin({ autoFillEmail }) {
                             <div className="p-px bg-transparent ml-auto overflow-hidden rounded-lg">
                                 <span className="font-medium text-white tracking-tight">
                                     <Link className="text-blue-400 hover:underline transition duration-200 ml-2" href="/forgot-password">
-                                        Forget your password?
+                                        'Forgot password?
                                     </Link>
                                 </span>
                             </div>

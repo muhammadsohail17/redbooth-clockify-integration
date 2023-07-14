@@ -1,6 +1,6 @@
 import Head from 'next/head'
-import React, { useState } from 'react'
-import { generateInvoiceData, generatePdfInvoice } from '../../data/util';
+import React, { useEffect, useState } from 'react'
+import { generateInvoiceData, generatePdfInvoice, unixTimestampToDate } from '../../data/util';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
@@ -21,8 +21,6 @@ export async function getServerSideProps(ctx) {
     // } else {
     //     res.render('generateInvoice', { data });
     // }
-
-
     return {
         props: {
             data: JSON.parse(JSON.stringify(data)),
@@ -75,6 +73,7 @@ export default function Invoice({ data, user }) {
                             <thead className="text-xs text-gray-700 uppercase">
                                 <tr className="border-b border-gray-400 ">
                                     <th className="px-6 py-3 w-full text-white bg-[#232e38] rounded-tl-[7px]">Project</th>
+                                    <th className="px-6 py-3 text-white bg-[#232e38]">Week Ending</th>
                                     <th className="px-6 py-3 text-white bg-[#232e38]">Hours</th>
                                     <th className="px-6 py-3 text-white bg-[#232e38]">Rate</th>
                                     <th className="px-6 py-3 text-white bg-[#232e38] rounded-tr-[7px]">Amount</th>
@@ -86,7 +85,8 @@ export default function Invoice({ data, user }) {
 
                                         {project.projectLoggingsData.map((weeklyLogging, index) => (
                                             <tr className={`border-b ${!data.customItems && index === project.projectLoggingsData.length - 1 ? 'border-transparent' : 'border-gray-400'}`} key={index}>
-                                                <td className="px-6 py-4 text-black"> {project.name}  - Work done from  {weeklyLogging.range}</td>
+                                                <td className="px-6 py-4 text-black"> {project.name}</td>
+                                                <td className="px-6 py-4 text-black whitespace-nowrap"> {unixTimestampToDate(weeklyLogging.rangeEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} </td>
                                                 <td className="px-6 py-4 text-black whitespace-nowrap"> {weeklyLogging.weeklyTotalLoggedHours} </td>
                                                 <td className="px-6 py-4 text-black whitespace-nowrap"> {data.currency}  {data.hourlyRate} </td>
                                                 <td className="px-6 py-4 text-black whitespace-nowrap"> {data.currency}  {weeklyLogging.weeklyTotals} </td>

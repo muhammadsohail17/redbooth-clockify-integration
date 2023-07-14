@@ -81,7 +81,7 @@ export default function signup() {
                                 </label>
                             </div>
                             <div className="w-full p-3">
-                                <button type="submit" className="inline-block mb-7 px-5 py-4 w-full text-white text-center font-semibold tracking-tight bg-indigo-500 hover:bg-indigo-600 rounded-lg focus:ring-4 focus:ring-indigo-300 transition duration-200" href="#">Create Free Account</button>
+                                <button type="submit" className="inline-block mb-7 px-5 py-4 w-full text-white text-center font-semibold tracking-tight bg-indigo-500 hover:bg-indigo-600 rounded-lg focus:ring-4 focus:ring-indigo-300 transition duration-200" href="#">Create Account</button>
                                 <span className="font-medium text-black tracking-tight">
                                     <span>Already have an account?</span>
                                     <a className="text-red-500 hover:text-red-700 transition duration-200 ml-2" href="/login">Sign In</a>

@@ -22,6 +22,18 @@ export async function getServerSideProps(ctx) {
 export default function GenerateInvoice({ user }) {
     const { rbUserId: newUserId } = user;
 
+    useEffect(() => {
+
+        const selectMonth = document.getElementById('monthSelect');
+        const currentMonth = new Date().getMonth() + 1;
+        selectMonth.value = currentMonth.toString();
+
+        const selectYear = document.getElementById('yearSelect');
+        const currentYear = new Date().getFullYear();
+        selectYear.value = currentYear.toString();
+
+    }, [])
+
 
     return <>
         <Head>
@@ -57,6 +69,7 @@ export default function GenerateInvoice({ user }) {
                                     <label className="block text-sm font-medium leading-6 text-gray-900">Select Month</label>
                                     <select
                                         name="month"
+                                        id="monthSelect"
                                         defaultValue={'1'}
                                         className="p-2 block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                                         <option value="1">January</option>
@@ -78,6 +91,7 @@ export default function GenerateInvoice({ user }) {
                                     <label className="block text-sm font-medium leading-6 text-gray-900">Select Year</label>
                                     <select name="year"
                                         defaultValue={'2023'}
+                                        id='yearSelect'
                                         className="p-2 block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                                         <option value="2023">2023</option>
                                         <option value="2024">2024</option>

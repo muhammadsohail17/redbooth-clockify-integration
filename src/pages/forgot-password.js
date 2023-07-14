@@ -3,32 +3,43 @@ import { useState } from "react";
 import axios from "axios";
 import { registerUser } from "@/data/dataModel";
 import Router from "next/router";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
 export async function getServerSideProps(ctx) {
+    const session = await getServerSession(ctx.req, ctx.res, authOptions);
 
-    const { token, email } = ctx.query;
-    let resetPassword = false;
-    let emailForReset = null; // Assign a default value of null
 
-    if (token) {
-        const user = await registerUser.findOne({ verificationToken: token });
-        if (user) {
-            resetPassword = true;
-            user.verificationToken = false;
-            await user.save();
+    if (session) {
+        return {
+            redirect: { destination: '/dashboard' },
+            props: {}
         }
-    }
+    } else {
+        const { token, email } = ctx.query;
+        let resetPassword = false;
+        let emailForReset = null; // Assign a default value of null
 
-    if (email) {
-        emailForReset = email; // Assign the value of `email` to `emailForReset`
-    }
+        if (token) {
+            const user = await registerUser.findOne({ verificationToken: token });
+            if (user) {
+                resetPassword = true;
+                user.verificationToken = false;
+                await user.save();
+            }
+        }
 
-    return {
-        props: {
-            resetPassword,
-            emailForReset,
-        },
-    };
+        if (email) {
+            emailForReset = email; // Assign the value of `email` to `emailForReset`
+        }
+
+        return {
+            props: {
+                resetPassword,
+                emailForReset,
+            },
+        };
+    }
 }
 
 
