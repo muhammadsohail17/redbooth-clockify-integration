@@ -1,13 +1,13 @@
 import Head from 'next/head'
-import React, { useEffect, useState } from 'react'
-import { generateInvoiceData, generatePdfInvoice, unixTimestampToDate } from '../../data/util';
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import React, { useState } from 'react'
+import { generateInvoiceData, generatePdfInvoice } from '@/data/util';
+import { getSession } from 'next-auth/react';
 
 export async function getServerSideProps(ctx) {
     const { User } = require('../../data/dataModel');
 
-    const session = await getServerSession(ctx.req, ctx.res, authOptions);
+    const { req } = ctx;
+    const session = await getSession({ req })
     const user = await User.findOne({ email: session.user.email }).lean();
     console.log('User Inside invoice', user)
 
@@ -73,7 +73,6 @@ export default function Invoice({ data, user }) {
                             <thead className="text-xs text-gray-700 uppercase">
                                 <tr className="border-b border-gray-400 ">
                                     <th className="px-6 py-3 w-full text-white bg-[#232e38] rounded-tl-[7px]">Project</th>
-                                    <th className="px-6 py-3 text-white bg-[#232e38]">Week Ending</th>
                                     <th className="px-6 py-3 text-white bg-[#232e38]">Hours</th>
                                     <th className="px-6 py-3 text-white bg-[#232e38]">Rate</th>
                                     <th className="px-6 py-3 text-white bg-[#232e38] rounded-tr-[7px]">Amount</th>
@@ -82,30 +81,25 @@ export default function Invoice({ data, user }) {
                             <tbody>
                                 {data.loggingsData.map((project, index) => (
                                     <React.Fragment key={index}>
-
                                         {project.projectLoggingsData.map((weeklyLogging, index) => (
                                             <tr className={`border-b ${!data.customItems && index === project.projectLoggingsData.length - 1 ? 'border-transparent' : 'border-gray-400'}`} key={index}>
-                                                <td className="px-6 py-4 text-black"> {project.name}</td>
-                                                <td className="px-6 py-4 text-black whitespace-nowrap"> {unixTimestampToDate(weeklyLogging.rangeEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} </td>
+                                                <td className="px-6 py-4 text-black"> {project.name}  - Work done from  {weeklyLogging.range}</td>
                                                 <td className="px-6 py-4 text-black whitespace-nowrap"> {weeklyLogging.weeklyTotalLoggedHours} </td>
                                                 <td className="px-6 py-4 text-black whitespace-nowrap"> {data.currency}  {data.hourlyRate} </td>
                                                 <td className="px-6 py-4 text-black whitespace-nowrap"> {data.currency}  {weeklyLogging.weeklyTotals} </td>
                                             </tr>
                                         ))}
-
                                     </React.Fragment>
                                 ))}
 
                                 {data.customItems && data.customItems.length ?
                                     data.customItems.map((cI, index) => (
-
-
-                                        <tr className={`border-b ${index === data.customItems.length - 1 ? 'border-transparent' : 'border-gray-400'}`} key={index}>
-                                            <td className="px-6 py-4 text-black"> {cI.item} </td>
-                                            <td className="px-6 py-4 text-black whitespace-nowrap"></td>
-                                            <td className="px-6 py-4 text-black whitespace-nowrap"></td>
-                                            <td className="px-6 py-4 text-black whitespace-nowrap"> {data.currency}  {cI.value} </td>
-                                        </tr>
+                                <tr className={`border-b ${index === data.customItems.length - 1 ? 'border-transparent' : 'border-gray-400'}`} key={index}>
+                                    <td className="px-6 py-4 text-black"> {cI.item} </td>
+                                    <td className="px-6 py-4 text-black whitespace-nowrap"></td>
+                                    <td className="px-6 py-4 text-black whitespace-nowrap"></td>
+                                    <td className="px-6 py-4 text-black whitespace-nowrap"> {data.currency}  {cI.value} </td>
+                                </tr>
                                     )) : ''}
                             </tbody>
                         </table>

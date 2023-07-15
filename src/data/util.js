@@ -164,8 +164,8 @@ const generateInvoiceData = async (month, year, userId, hourlyRate, invoiceNo, c
 
     data.monthlyTotals = Math.round(data.monthlyTotals * 100) / 100;
 
-    // const invoiceTemplate = fs.readFileSync('./views/invoiceTemplate.ejs', 'utf-8');
-    // data.renderedInvoiceTemplate = ejs.render(invoiceTemplate, { data });
+    const invoiceTemplate = fs.readFileSync('./src/data/invoiceTemplate.ejs', 'utf-8');
+    data.renderedInvoiceTemplate = ejs.render(invoiceTemplate, { data });
     return data;
 }
 
@@ -186,7 +186,7 @@ const generatePdfInvoice = async (invoiceData) => {
     return invoiceFile;
 }
 
-module.exports = {
+export default {
     generateInvoiceData,
     generatePdfInvoice,
     toHoursAndMinutes,
