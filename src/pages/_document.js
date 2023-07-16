@@ -5,6 +5,7 @@ export default function Document() {
     <Html lang="en">
       <Head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+        <link rel='icon' href='/favicon.png' />
       </Head>
       <body>
         <Main />

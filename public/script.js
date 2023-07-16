@@ -36,9 +36,8 @@ $(function () {
         var formData = $(this).serialize();
         var generatePdf = $(this).find('[name="generatePdf"]').val();
         console.log('formData', formData)
-        console.log('generatePdf', generatePdf)
 
-        var url = $(this).data( generatePdf == '1' ? 'invoice-pdf-url' : 'invoice-url' ) + '?' + formData;
+        var url = $(this).data(generatePdf == '1' ? 'invoice-pdf-url' : 'invoice-url') + '?' + formData;
         window.open(url, '_blank');
     });
 });

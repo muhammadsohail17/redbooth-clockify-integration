@@ -66,6 +66,8 @@ const unixTimestampToDate = (timestamp) => {
 }
 
 const generateInvoiceData = async (month, year, userId, hourlyRate, invoiceNo, customItem = null, customValue = null) => {
+    const fs = require("fs")
+    const ejs = require("ejs");
     const { User, Task, Project, Logging } = require('../data/dataModel');
     const startDate = getLastSundayOfMonth(month - 1, year, 1);
     const endDate = getLastSundayOfMonth(month, year);
@@ -169,26 +171,26 @@ const generateInvoiceData = async (month, year, userId, hourlyRate, invoiceNo, c
     return data;
 }
 
-const generatePdfInvoice = async (invoiceData) => {
-    const browser = await puppeteer.launch({ headless: "new" });
-    const page = await browser.newPage();
-    await page.setContent(invoiceData.renderedInvoiceTemplate, { waitUntil: 'domcontentloaded' });
-    // To reflect CSS used for screens instead of print
-    await page.emulateMediaType('screen');
-    //await page.screenshot({path: "canvas.png"})
-    var invoiceFile = `./invoices/${invoiceData.invoiceNo} - ${invoiceData.name} - ${invoiceData.invoiceDate}.pdf`;
-    let height = await page.evaluate(() => document.documentElement.offsetHeight);
-    await page.pdf({
-        path: invoiceFile,
-        height: height + 'px'
-    });
-    await browser.close();
-    return invoiceFile;
-}
+// const generatePdfInvoice = async (invoiceData) => {
+//     const browser = await puppeteer.launch({ headless: "new" });
+//     const page = await browser.newPage();
+//     await page.setContent(invoiceData.renderedInvoiceTemplate, { waitUntil: 'domcontentloaded' });
+//     // To reflect CSS used for screens instead of print
+//     await page.emulateMediaType('screen');
+//     //await page.screenshot({path: "canvas.png"})
+//     var invoiceFile = `./invoices/${invoiceData.invoiceNo} - ${invoiceData.name} - ${invoiceData.invoiceDate}.pdf`;
+//     let height = await page.evaluate(() => document.documentElement.offsetHeight);
+//     await page.pdf({
+//         path: invoiceFile,
+//         height: height + 'px'
+//     });
+//     await browser.close();
+//     return invoiceFile;
+// }
 
-export default {
+module.exports = {
     generateInvoiceData,
-    generatePdfInvoice,
+    // generatePdfInvoice,
     toHoursAndMinutes,
     getLastSundayOfMonth,
     getWeeklyRanges,

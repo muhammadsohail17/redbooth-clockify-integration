@@ -4,9 +4,7 @@ import { unixTimestampToDate } from '../data/util'
 
 export default function Dashboard({ projects, userData, userLoggings, data }) {
 
-    // console.log(projects)
     return <>
-        {/* {console.log('Dashboard', data.loggingsData)} */}
         <div className="flex overflow-x-hidden min-h-screen">
             <div className="px-4 py-2 bg-gray-200 bg-indigo-600 lg:w-1/5">
                 <svg xmlns="http://www.w3.org/2000/svg" className="inline w-8 h-8 text-white lg:hidden" fill="none"
@@ -26,7 +24,6 @@ export default function Dashboard({ projects, userData, userLoggings, data }) {
                 </div>
                 {projects.map((project, id) => (
                     <h1 key={id} className='text-white text-2xl'>{project.name}</h1>
-
                 ))}
 
 
@@ -90,7 +87,7 @@ export default function Dashboard({ projects, userData, userLoggings, data }) {
                                     <tbody className="bg-white">
                                         {/* {userData.map((data, id) => ( */}
                                         {data.loggingsData.map((project, id) => (
-                                            <>
+                                            <React.Fragment key={id}>
                                                 {project.projectLoggingsData.map((weeklyLogging, id) => (
                                                     <tr key={id} >
                                                         <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
@@ -104,12 +101,10 @@ export default function Dashboard({ projects, userData, userLoggings, data }) {
                                                             </div>
                                                         </td>
 
-
                                                         <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                                             <span
                                                                 className="inline-flex px-2 text-xs font-semibold leading-5 text-green-800">
                                                                 {unixTimestampToDate(weeklyLogging.rangeEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-
                                                             </span>
                                                         </td>
 
@@ -122,7 +117,7 @@ export default function Dashboard({ projects, userData, userLoggings, data }) {
 
                                                     </tr>
                                                 ))}
-                                            </>
+                                            </React.Fragment>
 
                                         ))}
 

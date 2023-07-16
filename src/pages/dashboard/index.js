@@ -3,7 +3,7 @@ import Link from 'next/link'
 import React from 'react'
 import connectDB from '../../data/db'
 import Dashboard from '../../components/Dashboard'
-import { generateInvoiceData } from '@/data/util';
+import { generateInvoiceData } from '../../data/util';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 

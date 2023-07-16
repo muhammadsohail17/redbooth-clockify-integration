@@ -8,24 +8,27 @@ const {
     getWeeklyRanges,
     dateToUnixTimestamp,
     unixTimestampToDate
-} = require('../../data/util').default
+} = require('../../data/util')
 import connectDB from '@/data/db';
 
 
 export default async function handler(req, res) {
-    const puppeteer = require("puppeteer")
-    const htmlCode = ``;
+    await connectDB();
+    const { month, year, userId, hourlyRate, invoiceNo, generatePdf, customItem, customValue } = req.query;
+    var data = await generateInvoiceData(month, year, userId, hourlyRate, invoiceNo, customItem, customValue);
+    // console.log('Data inside API', data)
 
+    const puppeteer = require("puppeteer")
     try {
         const browser = await puppeteer.launch({ headless: "new" });
         const page = await browser.newPage();
 
-        await page.setContent(htmlCode);
+        await page.setContent(data.renderedInvoiceTemplate);
         const pdfBuffer = await page.pdf();
         await browser.close();
         // Set the appropriate headers for file download
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=generated.pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=Invoice.pdf');
 
         // Send the generated PDF as a response
         res.send(pdfBuffer);
@@ -36,14 +39,3 @@ export default async function handler(req, res) {
 }
 
 
-// export default async function handler(req, res) {
-//     await connectDB();
-
-//     const { month, year, userId, hourlyRate, invoiceNo, generatePdf, customItem, customValue } = req.body;
-
-//     var data = await generateInvoiceData(month, year, userId, hourlyRate, invoiceNo, customItem, customValue);
-//     console.log('Data!', data)
-
-//     res.status(200).json({ data: data });
-
-// }

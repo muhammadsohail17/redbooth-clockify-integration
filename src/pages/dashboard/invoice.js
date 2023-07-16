@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import React, { useState } from 'react'
-import { generateInvoiceData, generatePdfInvoice } from '@/data/util';
+import { generateInvoiceData} from '@/data/util';
 import { getSession } from 'next-auth/react';
 
 export async function getServerSideProps(ctx) {
@@ -14,13 +14,7 @@ export async function getServerSideProps(ctx) {
     console.log(ctx.query)
     const { month, year, userId, hourlyRate, invoiceNo, customItem, customValue } = ctx.query;
     var data = await generateInvoiceData(month, year, userId, hourlyRate, invoiceNo, customItem, customValue);
-    // console.log(data)
-    // if (generatePdf) {
-    //     const invoiceFile = await generatePdfInvoice(data);
-    //     res.download(invoiceFile);
-    // } else {
-    //     res.render('generateInvoice', { data });
-    // }
+  
     return {
         props: {
             data: JSON.parse(JSON.stringify(data)),
