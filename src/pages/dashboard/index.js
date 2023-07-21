@@ -14,7 +14,6 @@ export async function getServerSideProps(ctx) {
     if (session) {
         try {
             await connectDB();
-            console.log("Index!", session.user.email)
             const user = await User.findOne({ email: session.user.email }).lean();
             //get rbUserId as userId from user object
             const { rbUserId: userId } = user;

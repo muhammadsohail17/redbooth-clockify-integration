@@ -1,6 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
-const fs = require('fs');
 const {
     generateInvoiceData,
     toHoursAndMinutes,
@@ -9,20 +8,29 @@ const {
     dateToUnixTimestamp,
     unixTimestampToDate
 } = require('../../data/util')
+// import connectDB from '@/data/db';
 import connectDB from '@/data/db';
 
-
 export default async function handler(req, res) {
-    await connectDB();
-    const { month, year, userId, hourlyRate, invoiceNo, generatePdf, customItem, customValue } = req.query;
-    var data = await generateInvoiceData(month, year, userId, hourlyRate, invoiceNo, customItem, customValue);
-    // console.log('Data inside API', data)
+    const fs = require("fs");
+    const ejs = require("ejs");
+    const puppeteer = require("puppeteer");
 
-    const puppeteer = require("puppeteer")
+    await connectDB();
+    const { month, year, userId, hourlyRate, invoiceNo } = req.body;
+    console.log("month, year, userId...", month, year, userId, hourlyRate, invoiceNo)
+    var data = await generateInvoiceData(month, year, userId, hourlyRate, invoiceNo);
+    console.log("data", data)
+
+    // const invoiceTemplate = fs.readFileSync('./src/data/invoiceTemplate.ejs', 'utf-8');
+    const invoiceTemplate = fs.readFileSync('./src/data/template.ejs', 'utf-8');
+    data.renderedInvoiceTemplate = ejs.render(invoiceTemplate, { data });
+    console.log("invoiceTemplate", data.renderedInvoiceTemplate)
     try {
         const browser = await puppeteer.launch({ headless: "new" });
         const page = await browser.newPage();
-
+        // const htmlCode = '<html><body><h1>Hello World</h1></body></html>'
+        // await page.setContent(htmlCode);
         await page.setContent(data.renderedInvoiceTemplate);
         const pdfBuffer = await page.pdf();
         await browser.close();

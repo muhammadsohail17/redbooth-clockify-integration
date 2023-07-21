@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 
 export default async function handler(req, res) {
     try {
-        await connectDB(); // Connect to the database
+        // await connectDB(); // Connect to the database
 
         const { password, confirmPassword, emailForReset } = req.body; // Extract password, confirmPassword, and emailForReset from the request body
         console.log(password, confirmPassword);

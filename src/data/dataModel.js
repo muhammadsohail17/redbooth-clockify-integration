@@ -7,7 +7,8 @@ const userSchema = new mongoose.Schema({
     username: String,
     email: String,
     password: String,
-    status: Boolean
+    status: Boolean,
+    houryRate: Number
 });
 // Create the User model
 const User = mongoose.models.users || mongoose.model('users', userSchema);

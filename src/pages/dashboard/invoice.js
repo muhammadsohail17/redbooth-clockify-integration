@@ -1,121 +1,487 @@
 import Head from 'next/head'
-import React, { useState } from 'react'
-import { generateInvoiceData} from '@/data/util';
-import { getSession } from 'next-auth/react';
+import React, { createContext, useEffect, useState } from 'react'
+import { generateInvoiceData } from '@/data/util';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+const axios = require("axios")
+
 
 export async function getServerSideProps(ctx) {
     const { User } = require('../../data/dataModel');
 
-    const { req } = ctx;
-    const session = await getSession({ req })
+    const session = await getServerSession(ctx.req, ctx.res, authOptions);
     const user = await User.findOne({ email: session.user.email }).lean();
-    console.log('User Inside invoice', user)
+    // console.log('User Inside invoice', user)
+    // console.log('ctx.query', ctx.query)
 
-    console.log(ctx.query)
     const { month, year, userId, hourlyRate, invoiceNo, customItem, customValue } = ctx.query;
     var data = await generateInvoiceData(month, year, userId, hourlyRate, invoiceNo, customItem, customValue);
-  
+
     return {
         props: {
             data: JSON.parse(JSON.stringify(data)),
-            user: JSON.parse(JSON.stringify(user))
+            user: JSON.parse(JSON.stringify(user)),
+            queryData: {
+                month,
+                year,
+                userId,
+                hourlyRate,
+                invoiceNo,
+            }
         }
     }
 }
 
-export default function Invoice({ data, user }) {
-    return <>
-        {console.log(data)}
-        <Head>
-            <title>Create Invoice</title>
-        </Head>
-        <div className="max-w-[85rem] mx-auto p-5">
-            <div className="sm:w-11/12 lg:w-3/4">
-                <div className="flex flex-col p-4">
-                    <div className="flex justify-between">
-                        <div className="font-semibold text-xl"> {user.name} </div>
-                        <div className="text-right">
-                            <h2 className="text-5xl">INVOICE</h2>
-                            <span className="mt-1 block text-2xl text-gray-500">#{data.invoiceNo}</span>
+const Invoice = ({ data, user, queryData }) => {
+    // console.log("queryData", queryData)
+
+    const [invoiceItems, setInvoiceItems] = useState([
+        {
+            project: '',
+            period: '',
+            rate: '',
+            hours: '',
+            charges: ''
+        }
+    ]);
+
+
+    const [showInputs, setShowInputs] = useState(true);
+    const [totalHours, setTotalHours] = useState(parseFloat(data.totalLoggedHours));
+
+    ////// Function to add a new line to invoiceItems
+
+    const addLine = () => {
+        setInvoiceItems(prevItems => [
+            ...prevItems,
+            {
+                project: '',
+                period: '',
+                rate: '',
+                hours: '',
+                charges: ''
+            }
+        ]);
+        setShowInputs(true);
+    };
+
+    ////// Function to delete a line from invoiceItems
+
+    const deleteLine = (index) => {
+        setInvoiceItems(prevItems => {
+            const updatedItems = [...prevItems];
+            updatedItems.splice(index, 1);
+            return updatedItems;
+        });
+    };
+
+    ////// Function to format a number with commas for thousands separator
+
+    const formatNumber = (number) => {
+        if (number >= 1000) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        } else {
+            return number.toString();
+        }
+    };
+
+    ////// Function to handle input change in invoiceItems
+
+    const handleInputChange = (e, index) => {
+        const { name, value } = e.target;
+        setInvoiceItems(prevItems => {
+            const updatedItems = [...prevItems];
+            updatedItems[index] = {
+                ...updatedItems[index],
+                [name]: value
+            };
+
+            if (name === 'rate') {
+                if (updatedItems[index].hours === '') {
+                    updatedItems[index].hours = "";
+                }
+                updatedItems[index].charges = calculateSubtotal(
+                    parseFloat(updatedItems[index].rate),
+                    parseFloat(updatedItems[index].hours)
+                );
+            }
+
+            // Update the total hours when hours are changed
+            if (name === 'hours') {
+                const newTotalHours = invoiceItems.reduce((total, item) => {
+                    const itemHours = parseFloat(item.hours);
+                    return itemHours ? total + itemHours : total;
+                }, 0);
+                setTotalHours(parseFloat(data.totalLoggedHours) + newTotalHours);
+            }
+
+            return updatedItems;
+        });
+    };
+
+    ////// Function to calculate the subtotal of a line item
+
+    const calculateSubtotal = (rate, hours) => {
+        if (rate && hours) {
+            return (rate * hours).toFixed(2);
+        } else if (rate) {
+            return parseFloat(rate).toFixed(2);
+        }
+        return 0;
+    };
+
+    ////// Function to handle download invoice
+
+    const handleDownloadInvoice = async () => {
+        console.log('Download Invoice');
+
+        try {
+            // Make the API call using Axios
+            const response = await axios.post('/api/generate', queryData);
+
+            // API call was successful, process the response here
+            console.log('API Response:', response);
+        } catch (error) {
+            // Handle errors if the API call was not successful
+            console.error('API Error:', error);
+        }
+
+
+    };
+
+    ////// Mouse enter and leave event handlers for download email, and share buttons
+
+    const [showDownloadText, setShowDownloadText] = useState(false);
+    const [showEmailText, setShowEmailText] = useState(false);
+    const [showShareText, setShowShareText] = useState(false);
+    const [domLoaded, setDomLoaded] = useState(false);
+
+    useEffect(() => {
+        setDomLoaded(true);
+    }, [])
+
+    const handleDownloadMouseEnter = () => {
+        setShowDownloadText(true);
+    };
+
+    const handleDownloadMouseLeave = () => {
+        setShowDownloadText(false);
+    };
+
+    const handleEmailMouseEnter = () => {
+        setShowEmailText(true);
+    };
+
+    const handleEmailMouseLeave = () => {
+        setShowEmailText(false);
+    };
+
+    const handleShareMouseEnter = () => {
+        setShowShareText(true);
+    };
+
+    const handleShareMouseLeave = () => {
+        setShowShareText(false);
+    };
+
+    ////// Calculate total hours
+
+    const totalLoggedHours = parseFloat(data.totalLoggedHours);
+    const customHours = invoiceItems.reduce((total, item) => {
+        const itemHours = parseFloat(item.hours);
+        return itemHours ? total + itemHours : total;
+    }, 0);
+    const updatedTotalHours = totalLoggedHours + customHours;
+
+    return (
+        <>
+            {domLoaded && (
+                <>
+
+                    <Head>
+                        <title>Create Invoice</title>
+                    </Head>
+
+                    <div id="invoice-container" className="container mx-auto p-4">
+                        <div className="flex justify-between">
+                            <div>
+                                <h1 className="text-3xl font-bold mb-4">{user.name}</h1>
+                                <hr className="border-double border-2 border-black mb-4" />
+                                <div className="mb-4">
+                                    <p className="font-bold py-2">Bill To:</p>
+                                    <span className="text-md">
+                                        Connextar Technologies Ltd
+                                        <br />
+                                        39 Seldon Street, Bradford,
+                                        <br />
+                                        BD5 9HH
+                                    </span>
+                                </div>
+                            </div>
+                            <div className='text-right flex flex-col justify-end mb-[16px]'>
+                                <p className="font-semibold py-0 text-left">Invoice Number: # {data.invoiceNo}</p>
+                                <p className="font-semibold py-1 text-left">Issue Date: {data.invoiceDate}</p>
+                                <p className="font-semibold py-0 text-left">Due Date: {data.invoiceDueDate}</p>
+                            </div>
                         </div>
-                    </div>
-                    <div className="mt-10">
-                        <table className="w-full text-sm text-left text-gray-500">
-                            <tbody>
+                        <table className="N01 w-full mt-8">
+                            <thead>
                                 <tr>
-                                    <td className="text-md text-gray-500">Bill To:</td>
-                                    <td className="text-md text-gray-500 text-right">Date:</td>
-                                    <td className="text-md text-black text-right"> {data.invoiceDate} </td>
-                                </tr>
-                                <tr>
-                                    <td className="text-md text-md font-semibold text-black">{data.companyName.toUpperCase()}</td>
-                                    <td className="text-md text-gray-500 text-right">Due Date:</td>
-                                    <td className="text-md text-black text-right">{data.invoiceDueDate}</td>
-                                </tr>
-                                <tr>
-                                    <td className="text-md ">{data.companyAddress.toUpperCase()}</td>
-                                    <td className="text-md font-semibold text-black text-right">
-                                        Balance Due:
-                                    </td>
-                                    <td className="text-md font-semibold text-black text-right">{data.currency} {data.monthlyTotals} </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className="border border-gray-400 rounded-lg mt-10">
-                        <table className="w-full text-sm text-left text-gray-500">
-                            <thead className="text-xs text-gray-700 uppercase">
-                                <tr className="border-b border-gray-400 ">
-                                    <th className="px-6 py-3 w-full text-white bg-[#232e38] rounded-tl-[7px]">Project</th>
-                                    <th className="px-6 py-3 text-white bg-[#232e38]">Hours</th>
-                                    <th className="px-6 py-3 text-white bg-[#232e38]">Rate</th>
-                                    <th className="px-6 py-3 text-white bg-[#232e38] rounded-tr-[7px]">Amount</th>
+                                    <th className="border px-4 py-2 bg-slate-50">Project</th>
+                                    <th className="border px-4 py-2 bg-slate-50 pl-2.5 pr-2.5">Period</th>
+                                    <th className="border px-4 py-2 bg-slate-50">Rate</th>
+                                    <th className="border px-4 py-2 bg-slate-50">Hours</th>
+                                    <th className="border px-4 py-2 bg-slate-50">Charges</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {data.loggingsData.map((project, index) => (
                                     <React.Fragment key={index}>
                                         {project.projectLoggingsData.map((weeklyLogging, index) => (
-                                            <tr className={`border-b ${!data.customItems && index === project.projectLoggingsData.length - 1 ? 'border-transparent' : 'border-gray-400'}`} key={index}>
-                                                <td className="px-6 py-4 text-black"> {project.name}  - Work done from  {weeklyLogging.range}</td>
-                                                <td className="px-6 py-4 text-black whitespace-nowrap"> {weeklyLogging.weeklyTotalLoggedHours} </td>
-                                                <td className="px-6 py-4 text-black whitespace-nowrap"> {data.currency}  {data.hourlyRate} </td>
-                                                <td className="px-6 py-4 text-black whitespace-nowrap"> {data.currency}  {weeklyLogging.weeklyTotals} </td>
+                                            <tr key={index}>
+                                                <td className="border px-8 py-2 text-center">{project.name}</td>
+                                                <td className="border px-6 py-2 text-center pl-2.5 pr-2.5">{weeklyLogging.range}</td>
+                                                <td className="border px-8 py-2 text-center">{data.currency} {parseFloat(data.hourlyRate).toFixed(2)}</td>
+                                                <td className="border px-8 py-2 text-center">{parseFloat(weeklyLogging.weeklyTotalLoggedHours).toFixed(2)}</td>
+                                                <td className="border px-8 py-2 text-center">{data.currency} {parseFloat(weeklyLogging.weeklyTotals).toFixed(2)}</td>
                                             </tr>
                                         ))}
                                     </React.Fragment>
                                 ))}
 
-                                {data.customItems && data.customItems.length ?
-                                    data.customItems.map((cI, index) => (
-                                <tr className={`border-b ${index === data.customItems.length - 1 ? 'border-transparent' : 'border-gray-400'}`} key={index}>
-                                    <td className="px-6 py-4 text-black"> {cI.item} </td>
-                                    <td className="px-6 py-4 text-black whitespace-nowrap"></td>
-                                    <td className="px-6 py-4 text-black whitespace-nowrap"></td>
-                                    <td className="px-6 py-4 text-black whitespace-nowrap"> {data.currency}  {cI.value} </td>
+                                {/* /////// Function for custom UI data fetch  */}
+
+                                {invoiceItems.map((item, index) => (
+                                    <tr key={index}>
+                                        <td className="N02 border px-4 py-2 text-center" style={{ padding: '0 0 0 0' }}>
+                                            {showInputs && (
+                                                <input
+                                                    name="project"
+                                                    value={item.project}
+                                                    onChange={(e) => handleInputChange(e, index)}
+                                                    className="px-4 py-2 w-full text-center"
+                                                    type="text"
+                                                    placeholder="Project"
+                                                />
+                                            )}
+                                            {!showInputs && item.project}
+                                        </td>
+                                        <td className="border px-4 py-2" style={{ padding: '0 0 0 0px' }}>
+                                            {showInputs && (
+                                                <input
+                                                    name="period"
+                                                    value={item.period}
+                                                    onChange={(e) => handleInputChange(e, index)}
+                                                    className="px-4 py-2 w-full text-center"
+                                                    type="text"
+                                                    placeholder="Period"
+                                                />
+                                            )}
+                                            {!showInputs && item.period}
+                                        </td>
+                                        <td className="border px-4 py-2 text-right" style={{ padding: '0 0 0 0px' }}>
+                                            {showInputs && (
+                                                <input
+                                                    name="rate"
+                                                    value={item.rate}
+                                                    onChange={(e) => handleInputChange(e, index)}
+                                                    className="px-4 py-2 w-full text-center"
+                                                    type="text"
+                                                    placeholder="Rate"
+                                                />
+                                            )}
+                                            {!showInputs && item.rate}
+                                        </td>
+                                        <td className="border px-4 py-2 text-left" style={{ padding: '0 0 0 0px' }}>
+                                            {showInputs && (
+                                                <input
+                                                    name="hours"
+                                                    value={item.hours}
+                                                    onChange={(e) => handleInputChange(e, index)}
+                                                    className="px-4 py-2 w-full text-center"
+                                                    type="text"
+                                                    placeholder="Hours"
+                                                />
+                                            )}
+                                            {!showInputs && item.hours}
+                                        </td>
+                                        <td className="border px-4 py-2 text-center" style={{ padding: '0 0 0 0px' }}>
+                                            {showInputs ? (
+                                                formatNumber(parseFloat(calculateSubtotal(item.rate, item.hours)).toFixed(2))
+                                            ) : (
+                                                formatNumber(parseFloat(item.charges).toFixed(2))
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+
+                                {/*//////// Function for calculate total hours and rate */}
+
+                                <tr>
+                                    <td className="border px-4 py-2 font-bold" colSpan="2"></td>
+                                    <td className="border px-6 py-2 font-bold text-center">Total:</td>
+                                    <td className="border px-8 py-2 font-bold text-center">
+                                        {formatNumber(updatedTotalHours.toFixed(2))}
+                                    </td>
+                                    <td className="border px-8 py-2 font-bold text-center">
+                                        {data.currency}
+                                        {formatNumber((data.monthlyTotals +
+                                            invoiceItems.reduce((total, item) => {
+                                                const subtotal = parseFloat(calculateSubtotal(item.rate, item.hours));
+                                                return subtotal ? total + subtotal : total;
+                                            }, 0)).toFixed(2)
+                                        )}
+                                    </td>
                                 </tr>
-                                    )) : ''}
                             </tbody>
                         </table>
+
+                        {/*//////// Section for Confirm, Add, & Cancel buttons */}
+
+                        <div className="flex justify-end mt-4 py-4">
+
+                            {/* Confirm button */}
+
+                            <button
+                                className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded mr-2"
+                                onClick={() => { }}
+                            >Confirm</button>
+
+                            {/* Add button */}
+
+                            {!showInputs && (
+                                <button
+                                    className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded mr-2"
+                                    onClick={addLine}
+                                >Add</button>
+                            )}
+
+                            {/* Cancel button */}
+
+                            {showInputs && (
+                                <button
+                                    className="bg-red-300 hover:bg-red-500 text-white font-bold py-2 px-4 rounded mr-2"
+                                    onClick={() => {
+                                        deleteLine();
+                                        setShowInputs(false);
+                                    }}
+                                >Cancel</button>
+                            )}
+                        </div>
+
+                        {/* ////// Section for balance due */}
+
+                        <div className="flex justify-end mt-2">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        {/* {console.log("invoiceItems.project", invoiceItems[0].project)} */}
+                                        {/* {console.log("invoiceItems.project", invoiceItems[0].rate)} */}
+                                        <td className="pr-2 font-bold">Balance Due:</td>
+                                        <td className="font-bold">
+                                            {data.currency}
+                                            {formatNumber(
+                                                (data.monthlyTotals +
+                                                    invoiceItems.reduce((total, item) => {
+                                                        const subtotal = parseFloat(calculateSubtotal(item.rate, item.hours));
+                                                        return subtotal ? total + subtotal : total;
+                                                    }, 0)).toFixed(2)
+                                            )}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* //////// Section for download, email, and share buttons */}
+
+                        <div className="inline float-right justify-end py-4 px-4 text-blue-400 hover:text-blue-600">
+
+                            {/* Download button */}
+
+                            <button className="">
+                                <svg
+                                    onMouseEnter={handleDownloadMouseEnter}
+                                    onMouseLeave={handleDownloadMouseLeave}
+                                    onClick={handleDownloadInvoice}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="h-8 w-8"
+                                >
+                                    <path d="M21 13v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
+                                {showDownloadText && (
+                                    <span className="absolute top-0 left-1/2 transform -translate-x-1/2 -mt-4 text-xs font-bold text-gray-800">
+                                        Download
+                                    </span>
+                                )}
+                            </button>
+
+                            {/* Email button */}
+
+                            {/* <button className="relative text-blue-400 hover:text-blue-600 px-4">
+                                <svg
+                                    onMouseEnter={handleEmailMouseEnter}
+                                    onMouseLeave={handleEmailMouseLeave}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="h-8 w-8"
+                                >
+                                    <path d="M22 5.79V18a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5.79L12 12L22 5.79Z" />
+                                </svg>
+                                {showEmailText && (
+                                    <span className="absolute top-0 left-1/2 transform -translate-x-1/2 -mt-4 text-xs font-bold text-gray-800">
+                                        Email
+                                    </span>
+                                )}
+                            </button> */}
+
+                            {/* Share button */}
+
+                            {/* <button className="relative">
+                                <svg
+                                    onMouseEnter={handleShareMouseEnter}
+                                    onMouseLeave={handleShareMouseLeave}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="h-8 w-8"
+                                >
+                                    <circle cx="18" cy="5" r="3" />
+                                    <circle cx="6" cy="12" r="3" />
+                                    <circle cx="18" cy="19" r="3" />
+                                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                                </svg>
+                                {showShareText && (
+                                    <span className="absolute top-0 left-1/2 transform -translate-x-1/2 -mt-4 text-xs font-bold text-gray-800">
+                                        Share
+                                    </span>
+                                )}
+                            </button> */}
+                        </div>
                     </div>
-                    <div className="mt-10">
-                        <table className="w-full text-sm text-left text-gray-500">
-                            <tbody>
-                                <tr>
-                                    <td className="px-12"></td>
-                                    <td className="text-md text-gray-500 text-right">Total Logged Hours:</td>
-                                    <td className="text-md text-black text-right"> {data.totalLoggedHours} </td>
-                                </tr>
-                                <tr>
-                                    <td className="px-12"></td>
-                                    <td className="text-md text-gray-500 text-right">Total:</td>
-                                    <td className="text-md text-black text-right"> {data.currency}  {data.monthlyTotals} </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </>
-}
+                </>
+            )}
+        </>
+
+    );
+};
+
+export default Invoice;

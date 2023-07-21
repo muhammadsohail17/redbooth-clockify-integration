@@ -7,7 +7,7 @@ const nodemailer = require('nodemailer')
 
 export default async function handler(req, res) {
   try {
-    connectDB();
+    // connectDB();
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {

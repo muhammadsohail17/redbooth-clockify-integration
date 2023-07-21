@@ -8,7 +8,7 @@ const dns = require('dns');
 
 export default async function handler(req, res) {
     try {
-        await connectDB();
+        // await connectDB();
 
         // Create a transporter for sending emails using Gmail SMTP
         const transporter = nodemailer.createTransport({

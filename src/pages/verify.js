@@ -5,7 +5,7 @@ export const getServerSideProps = async (ctx) => {
     const { registerUser } = require("../data/dataModel");
     const { token } = ctx.query;
     try {
-        await connectDB();
+        // await connectDB();
         // Find the user with the provided verification token
         const user = await registerUser.findOne({ verificationToken: token });
         if (!user) {

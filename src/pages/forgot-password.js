@@ -119,7 +119,7 @@ export default function sendLink({ resetPassword, emailForReset }) {
                                 <button type="submit" className="p-4 w-full text-white font-semibold  bg-indigo-500 hover:bg-indigo-600 outline-none border border-gray-600 rounded-lg focus:border-indigo-500 transition duration-200">Reset</button>
                             </div>
                         </form>
-                    </div> : <div> {
+                    </div> : <div>{
                         message.status == 1 ? <div><h4 className="font-serif mb-4 text-5xl text-black tracking-tighter">Reset Link Sent!</h4>
                             `<p className="mb-7 text-xl text-black tracking-tight">If the email address <strong>{email}</strong> is registered, an email will be sent to you with instructions on how to retrieve your password.</p>`
                             <p className="mb-7 text-xl text-black tracking-tight">Additionally, please remember to check your spam folder if you can't locate the email. Once you receive it, simply follow the link provided in the email to log in to the Redbooth and Clockify integration.</p></div>
