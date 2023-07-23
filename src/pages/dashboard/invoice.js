@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import React, { createContext, useEffect, useState } from 'react'
-import { generateInvoiceData } from '@/data/util';
+import { generateInvoiceData, renderedInvoiceData } from '@/data/util';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 const axios = require("axios")
@@ -14,13 +14,17 @@ export async function getServerSideProps(ctx) {
     // console.log('User Inside invoice', user)
     // console.log('ctx.query', ctx.query)
 
-    const { month, year, userId, hourlyRate, invoiceNo, customItem, customValue } = ctx.query;
-    var data = await generateInvoiceData(month, year, userId, hourlyRate, invoiceNo, customItem, customValue);
+    const { month, year, userId, hourlyRate, invoiceNo } = ctx.query;
+    var data = await generateInvoiceData(month, year, userId, hourlyRate, invoiceNo);
+    // console.log('data', data)
+    // const invoiceDefaultData = renderedInvoiceData(data);
+    // console.log("invoiceDefaultData", invoiceDefaultData)
 
     return {
         props: {
             data: JSON.parse(JSON.stringify(data)),
             user: JSON.parse(JSON.stringify(user)),
+            // invoiceDefaultData: JSON.parse(JSON.stringify(invoiceDefaultData)),
             queryData: {
                 month,
                 year,
@@ -33,18 +37,15 @@ export async function getServerSideProps(ctx) {
 }
 
 const Invoice = ({ data, user, queryData }) => {
-    // console.log("queryData", queryData)
 
-    const [invoiceItems, setInvoiceItems] = useState([
-        {
-            project: '',
-            period: '',
-            rate: '',
-            hours: '',
-            charges: ''
-        }
-    ]);
-
+    const [invoiceData, setInvoiceData] = useState(renderedInvoiceData(data));
+    const [invoiceItems, setInvoiceItems] = useState([{
+        project: '',
+        period: '',
+        rate: '',
+        hours: '',
+        charges: ''
+    }]);
 
     const [showInputs, setShowInputs] = useState(true);
     const [totalHours, setTotalHours] = useState(parseFloat(data.totalLoggedHours));
@@ -97,9 +98,7 @@ const Invoice = ({ data, user, queryData }) => {
             };
 
             if (name === 'rate') {
-                if (updatedItems[index].hours === '') {
-                    updatedItems[index].hours = "";
-                }
+
                 updatedItems[index].charges = calculateSubtotal(
                     parseFloat(updatedItems[index].rate),
                     parseFloat(updatedItems[index].hours)
@@ -136,8 +135,10 @@ const Invoice = ({ data, user, queryData }) => {
         console.log('Download Invoice');
 
         try {
+            const requestData = { queryData, invoiceItems };
             // Make the API call using Axios
-            const response = await axios.post('/api/generate', queryData);
+            
+            const response = await axios.post('/api/generate', requestData);
 
             // API call was successful, process the response here
             console.log('API Response:', response);
@@ -145,9 +146,9 @@ const Invoice = ({ data, user, queryData }) => {
             // Handle errors if the API call was not successful
             console.error('API Error:', error);
         }
-
-
     };
+
+
 
     ////// Mouse enter and leave event handlers for download email, and share buttons
 
@@ -158,7 +159,10 @@ const Invoice = ({ data, user, queryData }) => {
 
     useEffect(() => {
         setDomLoaded(true);
-    }, [])
+        setInvoiceData(renderedInvoiceData(data, invoiceItems));
+        console.log('invoiceItems', invoiceItems)
+        console.log('invoiceData', invoiceData)
+    }, [invoiceItems])
 
     const handleDownloadMouseEnter = () => {
         setShowDownloadText(true);
@@ -192,6 +196,9 @@ const Invoice = ({ data, user, queryData }) => {
         return itemHours ? total + itemHours : total;
     }, 0);
     const updatedTotalHours = totalLoggedHours + customHours;
+
+
+
 
     return (
         <>
@@ -375,17 +382,13 @@ const Invoice = ({ data, user, queryData }) => {
                             <table>
                                 <tbody>
                                     <tr>
-                                        {/* {console.log("invoiceItems.project", invoiceItems[0].project)} */}
-                                        {/* {console.log("invoiceItems.project", invoiceItems[0].rate)} */}
                                         <td className="pr-2 font-bold">Balance Due:</td>
                                         <td className="font-bold">
                                             {data.currency}
-                                            {formatNumber(
-                                                (data.monthlyTotals +
-                                                    invoiceItems.reduce((total, item) => {
-                                                        const subtotal = parseFloat(calculateSubtotal(item.rate, item.hours));
-                                                        return subtotal ? total + subtotal : total;
-                                                    }, 0)).toFixed(2)
+                                            {formatNumber((data.monthlyTotals + invoiceItems.reduce((total, item) => {
+                                                const subtotal = parseFloat(calculateSubtotal(item.rate, item.hours));
+                                                return subtotal ? total + subtotal : total;
+                                            }, 0)).toFixed(2)
                                             )}
                                         </td>
                                     </tr>

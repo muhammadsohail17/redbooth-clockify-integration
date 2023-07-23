@@ -6,7 +6,9 @@ const {
     getLastSundayOfMonth,
     getWeeklyRanges,
     dateToUnixTimestamp,
-    unixTimestampToDate
+    unixTimestampToDate,
+    formatNumber,
+    renderedInvoiceData
 } = require('../../data/util')
 // import connectDB from '@/data/db';
 import connectDB from '@/data/db';
@@ -17,15 +19,16 @@ export default async function handler(req, res) {
     const puppeteer = require("puppeteer");
 
     await connectDB();
-    const { month, year, userId, hourlyRate, invoiceNo } = req.body;
-    console.log("month, year, userId...", month, year, userId, hourlyRate, invoiceNo)
+    const { month, year, userId, hourlyRate, invoiceNo } = req.body.queryData;
     var data = await generateInvoiceData(month, year, userId, hourlyRate, invoiceNo);
-    console.log("data", data)
+    data.invoiceItems = req.body.invoiceItems;
+    console.log("Dataaaa", data.invoiceItems)
 
     // const invoiceTemplate = fs.readFileSync('./src/data/invoiceTemplate.ejs', 'utf-8');
     const invoiceTemplate = fs.readFileSync('./src/data/template.ejs', 'utf-8');
     data.renderedInvoiceTemplate = ejs.render(invoiceTemplate, { data });
     console.log("invoiceTemplate", data.renderedInvoiceTemplate)
+
     try {
         const browser = await puppeteer.launch({ headless: "new" });
         const page = await browser.newPage();

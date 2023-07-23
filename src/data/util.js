@@ -169,6 +169,36 @@ const generateInvoiceData = async (month, year, userId, hourlyRate, invoiceNo, c
     return data;
 }
 
+const renderedInvoiceData = (data, invoiceItems = []) => {
+    const renderedInvoiceItems = [];
+    if (data) {
+        for (const project of data.loggingsData) {
+            for (const weeklyLogging of project.projectLoggingsData) {
+                renderedInvoiceItems.push({
+                    project: project.name,
+                    period: weeklyLogging.range,
+                    rate: parseFloat(data.hourlyRate).toFixed(2),
+                    hours: parseFloat(weeklyLogging.weeklyTotalLoggedHours).toFixed(2),
+                    charges: parseFloat(data.hourlyRate).toFixed(2) * parseFloat(weeklyLogging.weeklyTotalLoggedHours).toFixed(2)
+                });
+            }
+        }
+    }
+    
+
+    for (const invoiceItem of invoiceItems) {
+        renderedInvoiceItems.push({
+            project: invoiceItem.project,
+            period: invoiceItem.period,
+            rate: invoiceItem.rate,
+            hours: invoiceItem.hours,
+            charges: invoiceItem.charges
+        });
+    }
+
+    return renderedInvoiceItems;
+}
+
 // const generatePdfInvoice = async (invoiceData) => {
 //     const browser = await puppeteer.launch({ headless: "new" });
 //     const page = await browser.newPage();
@@ -186,6 +216,14 @@ const generateInvoiceData = async (month, year, userId, hourlyRate, invoiceNo, c
 //     return invoiceFile;
 // }
 
+const formatNumber = (number) => {
+    if (number >= 1000) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    } else {
+        return number.toString();
+    }
+};
+
 module.exports = {
     generateInvoiceData,
     // generatePdfInvoice,
@@ -193,5 +231,7 @@ module.exports = {
     getLastSundayOfMonth,
     getWeeklyRanges,
     dateToUnixTimestamp,
-    unixTimestampToDate
+    unixTimestampToDate,
+    formatNumber,
+    renderedInvoiceData
 }
