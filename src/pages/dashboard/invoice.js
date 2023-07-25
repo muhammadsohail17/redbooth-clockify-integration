@@ -37,6 +37,7 @@ export async function getServerSideProps(ctx) {
 }
 
 const Invoice = ({ data, user, queryData }) => {
+    console.log("Dataaaa", data)
 
     const [invoiceData, setInvoiceData] = useState(renderedInvoiceData(data));
     const [invoiceItems, setInvoiceItems] = useState([{
@@ -137,7 +138,7 @@ const Invoice = ({ data, user, queryData }) => {
         try {
             const requestData = { queryData, invoiceItems };
             // Make the API call using Axios
-            
+
             const response = await axios.post('/api/generate', requestData);
 
             // API call was successful, process the response here
