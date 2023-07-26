@@ -65,20 +65,29 @@
                     <% } %>
                         <% } %>
 
-                            <% if (data.invoiceItems && data.invoiceItems.length) { %>
-                                <% for (const item of data.invoiceItems) { %>
-                                    <tr class="border-b border-gray-400">
-                                        <td class="border px-8 py-2 text-center">
-                                            <%= item.project %>
-                                        </td>
-                                        <td class="border px-6 py-2 text-center pl-2.5 pr-2.5"></td>
-                                        <td class="border px-8 py-2 text-center">
-                                            <%= item.rate %>
-                                        </td>
-                                        <td class="border px-8 py-2 text-center"></td>
-                                    </tr>
-                                    <% } %>
+                            <% if (invoiceData.renderedInvoiceData && invoiceData.renderedInvoiceData.length) { %>
+                                <% for (const item of invoiceData.renderedInvoiceData) { %>
+                                    <% if(item.customItem) { %>
+                                        <tr class="border-b border-gray-400">
+                                            <td class="border px-8 py-2 text-center">
+                                                <%= item.project %>
+                                            </td>
+                                            <td class="border px-6 py-2 text-center pl-2.5 pr-2.5">
+                                                <%= item.period %>
+                                            </td>
+                                            <td class="border px-8 py-2 text-center">
+                                                <%= item.rate %>
+                                            </td>
+                                            <td class="border px-8 py-2 text-center">
+                                                <%= item.hours %>
+                                            </td>
+                                            <td class="border px-8 py-2 text-center">
+                                                <%= item.charges %>
+                                            </td>
+                                        </tr>
                                         <% } %>
+                                            <% } %>
+                                                <% } %>
 
 
         </tbody>
@@ -86,39 +95,21 @@
 
 
     </table>
-    <% function formatNumber(number) { if (number>= 1000) {
-        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        } else {
-        return number.toString();
-        }
-        }%>
 
-        <% const calculateSubtotal=(rate, hours)=> {
-            if (rate && hours) {
-            return (rate * hours).toFixed(2);
-            } else if (rate) {
-            return parseFloat(rate).toFixed(2);
-            }
-            return 0;
-            } %>
-
-            <div class="flex justify-end mt-2">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td class="pr-2 font-bold">Balance Due:</td>
-                            <td class="font-bold">
-                                <%= data.currency %>
-                                    <%- formatNumber((data.monthlyTotals + data.invoiceItems.reduce((total, item)=> {
-                                        const subtotal = parseFloat(calculateSubtotal(item.rate, item.hours));
-                                        return subtotal ? total + subtotal : total;
-                                        }, 0)).toFixed(2)) %>
+    <div class="flex justify-end mt-2">
+        <table>
+            <tbody>
+                <tr>
+                    <td class="pr-2 font-bold">Balance Due:</td>
+                    <td class="font-bold">
+                        <%= data.currency %>
+                            <%- (invoiceData.invoiceTotals).toFixed(2)%>
 
 
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
 </div>

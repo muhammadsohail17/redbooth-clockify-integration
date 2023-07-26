@@ -170,6 +170,9 @@ const generateInvoiceData = async (month, year, userId, hourlyRate, invoiceNo, c
 }
 
 const renderedInvoiceData = (data, invoiceItems = []) => {
+    const parsedData = {
+        invoiceTotals: data.monthlyTotals
+    }
     const renderedInvoiceItems = [];
     if (data) {
         for (const project of data.loggingsData) {
@@ -184,7 +187,6 @@ const renderedInvoiceData = (data, invoiceItems = []) => {
             }
         }
     }
-    
 
     for (const invoiceItem of invoiceItems) {
         renderedInvoiceItems.push({
@@ -192,11 +194,15 @@ const renderedInvoiceData = (data, invoiceItems = []) => {
             period: invoiceItem.period,
             rate: invoiceItem.rate,
             hours: invoiceItem.hours,
-            charges: invoiceItem.charges
+            charges: invoiceItem.charges,
+            customItem: true
         });
+        parsedData.invoiceTotals += parseFloat(invoiceItem.charges);
     }
+    parsedData.invoiceTotals = formatNumber(parsedData.invoiceTotals)
+    parsedData.renderedInvoiceData = renderedInvoiceItems;
 
-    return renderedInvoiceItems;
+    return parsedData;
 }
 
 // const generatePdfInvoice = async (invoiceData) => {

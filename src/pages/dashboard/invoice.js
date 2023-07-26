@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import React, { createContext, useEffect, useState } from 'react'
-import { generateInvoiceData, renderedInvoiceData } from '@/data/util';
+import { generateInvoiceData, renderedInvoiceData, formatNumber } from '@/data/util';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 const axios = require("axios")
@@ -37,8 +37,6 @@ export async function getServerSideProps(ctx) {
 }
 
 const Invoice = ({ data, user, queryData }) => {
-    console.log("Dataaaa", data)
-
     const [invoiceData, setInvoiceData] = useState(renderedInvoiceData(data));
     const [invoiceItems, setInvoiceItems] = useState([{
         project: '',
@@ -79,51 +77,43 @@ const Invoice = ({ data, user, queryData }) => {
 
     ////// Function to format a number with commas for thousands separator
 
-    const formatNumber = (number) => {
-        if (number >= 1000) {
-            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        } else {
-            return number.toString();
-        }
-    };
-
     ////// Function to handle input change in invoiceItems
 
     const handleInputChange = (e, index) => {
         const { name, value } = e.target;
-        setInvoiceItems(prevItems => {
-            const updatedItems = [...prevItems];
-            updatedItems[index] = {
-                ...updatedItems[index],
-                [name]: value
-            };
 
-            if (name === 'rate') {
+        const updatedItems = [...invoiceItems];
+        updatedItems[index] = {
+            ...updatedItems[index],
+            [name]: value
+        };
 
-                updatedItems[index].charges = calculateSubtotal(
-                    parseFloat(updatedItems[index].rate),
-                    parseFloat(updatedItems[index].hours)
-                );
-            }
-
-            // Update the total hours when hours are changed
-            if (name === 'hours') {
-                const newTotalHours = invoiceItems.reduce((total, item) => {
-                    const itemHours = parseFloat(item.hours);
-                    return itemHours ? total + itemHours : total;
-                }, 0);
-                setTotalHours(parseFloat(data.totalLoggedHours) + newTotalHours);
-            }
-
-            return updatedItems;
-        });
+        if (name === 'rate' || name == 'hours') {
+            updatedItems[index].charges = calculateSubtotal(
+                updatedItems[index].rate,
+                updatedItems[index].hours
+            );
+        }
+        // Update the total hours when hours are changed
+        if (name === 'hours') {
+            const newTotalHours = invoiceItems.reduce((total, item) => {
+                const itemHours = parseFloat(item.hours);
+                return itemHours ? total + itemHours : total;
+            }, 0);
+            setTotalHours(parseFloat(data.totalLoggedHours) + newTotalHours);
+        }
+        setInvoiceItems(updatedItems);
+        setInvoiceData(prevItems => {
+            console.log(renderedInvoiceData(data, updatedItems))
+            return renderedInvoiceData(data, updatedItems);
+        })
     };
 
     ////// Function to calculate the subtotal of a line item
 
     const calculateSubtotal = (rate, hours) => {
         if (rate && hours) {
-            return (rate * hours).toFixed(2);
+            return parseFloat(rate * hours).toFixed(2);
         } else if (rate) {
             return parseFloat(rate).toFixed(2);
         }
@@ -132,11 +122,14 @@ const Invoice = ({ data, user, queryData }) => {
 
     ////// Function to handle download invoice
 
+
     const handleDownloadInvoice = async () => {
-        console.log('Download Invoice');
+
+
+        // console.log('Download Invoice');
 
         try {
-            const requestData = { queryData, invoiceItems };
+            const requestData = { queryData, invoiceData };
             // Make the API call using Axios
 
             const response = await axios.post('/api/generate', requestData);
@@ -160,9 +153,9 @@ const Invoice = ({ data, user, queryData }) => {
 
     useEffect(() => {
         setDomLoaded(true);
-        setInvoiceData(renderedInvoiceData(data, invoiceItems));
-        console.log('invoiceItems', invoiceItems)
-        console.log('invoiceData', invoiceData)
+        // setInvoiceData(renderedInvoiceData(data, invoiceItems));
+        // console.log('invoiceItems', invoiceItems)
+        // console.log('invoiceData', invoiceData)
     }, [invoiceItems])
 
     const handleDownloadMouseEnter = () => {
@@ -198,7 +191,9 @@ const Invoice = ({ data, user, queryData }) => {
     }, 0);
     const updatedTotalHours = totalLoggedHours + customHours;
 
-
+    const confirmInvoice = () => {
+        console.log('invoiceData', invoiceData)
+    }
 
 
     return (
@@ -243,18 +238,15 @@ const Invoice = ({ data, user, queryData }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {data.loggingsData.map((project, index) => (
-                                    <React.Fragment key={index}>
-                                        {project.projectLoggingsData.map((weeklyLogging, index) => (
-                                            <tr key={index}>
-                                                <td className="border px-8 py-2 text-center">{project.name}</td>
-                                                <td className="border px-6 py-2 text-center pl-2.5 pr-2.5">{weeklyLogging.range}</td>
-                                                <td className="border px-8 py-2 text-center">{data.currency} {parseFloat(data.hourlyRate).toFixed(2)}</td>
-                                                <td className="border px-8 py-2 text-center">{parseFloat(weeklyLogging.weeklyTotalLoggedHours).toFixed(2)}</td>
-                                                <td className="border px-8 py-2 text-center">{data.currency} {parseFloat(weeklyLogging.weeklyTotals).toFixed(2)}</td>
-                                            </tr>
-                                        ))}
-                                    </React.Fragment>
+                                {invoiceData.renderedInvoiceData.map((invoiceItem, index) => (
+                                    !invoiceItem.customItem ?
+                                        <tr key={index}>
+                                            <td className="border px-8 py-2 text-center">{invoiceItem.project}</td>
+                                            <td className="border px-6 py-2 text-center pl-2.5 pr-2.5">{invoiceItem.period}</td>
+                                            <td className="border px-8 py-2 text-center">{data.currency} {invoiceItem.rate}</td>
+                                            <td className="border px-8 py-2 text-center">{invoiceItem.hours}</td>
+                                            <td className="border px-8 py-2 text-center">{data.currency} {invoiceItem.charges}</td>
+                                        </tr> : ''
                                 ))}
 
                                 {/* /////// Function for custom UI data fetch  */}
@@ -333,12 +325,7 @@ const Invoice = ({ data, user, queryData }) => {
                                     </td>
                                     <td className="border px-8 py-2 font-bold text-center">
                                         {data.currency}
-                                        {formatNumber((data.monthlyTotals +
-                                            invoiceItems.reduce((total, item) => {
-                                                const subtotal = parseFloat(calculateSubtotal(item.rate, item.hours));
-                                                return subtotal ? total + subtotal : total;
-                                            }, 0)).toFixed(2)
-                                        )}
+                                        {invoiceData.invoiceTotals}
                                     </td>
                                 </tr>
                             </tbody>
@@ -352,7 +339,7 @@ const Invoice = ({ data, user, queryData }) => {
 
                             <button
                                 className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded mr-2"
-                                onClick={() => { }}
+                                onClick={confirmInvoice}
                             >Confirm</button>
 
                             {/* Add button */}
