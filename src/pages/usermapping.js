@@ -14,7 +14,7 @@ const userMappings = [
 
     //////// Amir
     {
-        rbUserId: null, // Redbooth ID
+        rbUserId: 407079, // Redbooth ID
         cfUserId: '643396ff3571b66d0266969d' // Clockify userID
     },
 
@@ -26,13 +26,13 @@ const userMappings = [
 
     ///////Haider Ali
     {
-        rbUserId: 1298545 , // Redbooth ID
+        rbUserId: 1298545, // Redbooth ID
         cfUserId: '643d15ffd00ede21e7bb9e20' // Clockify userID
     },
 
     ////////Amandeep kaur
     {
-        rbUserId: null ,// Redbooth ID
+        rbUserId: 1315126,// Redbooth ID
         cfUserId: '643d4556b3a5a87f732441c8' // Clockify userID
     },
 
@@ -68,7 +68,7 @@ const userMappings = [
 
     ////// Rakesh thakur
     {
-        rbUserId: null , // Redbooth ID
+        rbUserId: 3646607, // Redbooth ID
         cfUserId: '643d5657fdce3522c8b32578' // Clockify userID
     },
 
@@ -116,7 +116,7 @@ const userMappings = [
       
     ////// vishal
     {
-        rbUserId: null,// Redbooth ID
+        rbUserId: 1033278,// Redbooth ID
         cfUserId: '643d4f60fdce3522c8b1a8d5' // Clockify userID
     },
 
