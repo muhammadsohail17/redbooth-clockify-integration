@@ -199,7 +199,7 @@ const renderedInvoiceData = (data, invoiceItems = []) => {
         });
         parsedData.invoiceTotals += parseFloat(invoiceItem.charges);
     }
-    parsedData.invoiceTotals = formatNumber(parsedData.invoiceTotals)
+    parsedData.invoiceTotals = formatNumber((parsedData.invoiceTotals).toFixed(2))
     parsedData.renderedInvoiceData = renderedInvoiceItems;
 
     return parsedData;
