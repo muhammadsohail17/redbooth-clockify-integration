@@ -73,7 +73,10 @@
                                                 <%= item.project %>
                                             </td>
                                             <td class="border px-6 py-2 text-center pl-2.5 pr-2.5">
-                                                <%= item.period %>
+                                                <% if (typeof item.period == 'object' ) { %>
+                                                    <%= item.period.startDate %> To <%= item.period.endDate %>
+                                                            <% } %>
+
                                             </td>
                                             <td class="border px-8 py-2 text-center">
                                                 <%= item.rate %>

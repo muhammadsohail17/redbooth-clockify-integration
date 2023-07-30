@@ -37,15 +37,20 @@ export async function getServerSideProps(ctx) {
 }
 
 const Invoice = ({ data, user, queryData }) => {
+
+    var currentDate = new Date().toLocaleDateString('en-CA');
+
     const [invoiceData, setInvoiceData] = useState(renderedInvoiceData(data));
     const [invoiceItems, setInvoiceItems] = useState([{
         project: '',
-        period: '',
+        period: {
+            startDate: '',
+            endDate: ''
+        },
         rate: '',
         hours: '',
         charges: ''
     }]);
-
     const [showInputs, setShowInputs] = useState(true);
     const [totalHours, setTotalHours] = useState(parseFloat(data.totalLoggedHours));
 
@@ -125,13 +130,9 @@ const Invoice = ({ data, user, queryData }) => {
 
     const handleDownloadInvoice = async () => {
 
-
-        // console.log('Download Invoice');
-
         try {
             const requestData = { queryData, invoiceData };
             // Make the API call using Axios
-
             const response = await axios.post('/api/generate', requestData);
 
             // API call was successful, process the response here
@@ -195,11 +196,63 @@ const Invoice = ({ data, user, queryData }) => {
         console.log('invoiceData', invoiceData)
     }
 
+    function dateChangeHandler(event, field) {
+        const newInvoiceItems = [...invoiceItems];
+
+        let myDate = event.target.value;
+        const dateObject = new Date(myDate);
+        const formattedDate = dateObject.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
+
+        if (field === 'startDate') {
+
+            newInvoiceItems[0] = {
+                ...newInvoiceItems[0],
+                period: {
+                    ...newInvoiceItems[0].period,
+                    startDate: formattedDate,
+                },
+            };
+        } else if (field === 'endDate') {
+            
+            newInvoiceItems[0] = {
+                ...newInvoiceItems[0], period: {
+                    ...newInvoiceItems[0].period,
+                    endDate: formattedDate,
+                },
+            };
+        }
+        setInvoiceItems(newInvoiceItems);
+        console.log(newInvoiceItems);
+    }
+
+    // function dateChangeHandler(field, event) {
+    //     const newInvoiceItems = [...invoiceItems];
+    //     if (field === 'startDate' || field === 'endDate') {
+    //         const newStartDate = field === 'startDate' ? event.target.value : newInvoiceItems[0].period.startDate;
+    //         const newEndDate = field === 'endDate' ? event.target.value : newInvoiceItems[0].period.endDate;
+    //         newInvoiceItems[0] = {
+    //             ...newInvoiceItems[0],
+    //             period: {
+    //                 ...newInvoiceItems[0].period,
+    //                 startDate: newStartDate,
+    //                 endDate: newEndDate,
+    //                 dateRange: `${newStartDate} to ${newEndDate}`,
+    //             },
+    //         };
+    //     }
+    //     console.log(newInvoiceItems);
+    // }
+
 
     return (
         <>
             {domLoaded && (
                 <>
+
 
                     <Head>
                         <title>Create Invoice</title>
@@ -266,8 +319,8 @@ const Invoice = ({ data, user, queryData }) => {
                                             )}
                                             {!showInputs && item.project}
                                         </td>
-                                        <td className="border px-4 py-2" style={{ padding: '0 0 0 0px' }}>
-                                            {showInputs && (
+                                        <td className="border px-4 py-2 max-w-[240px] " style={{ padding: '0 0 0 0px' }}>
+                                            {/* {showInputs && (
                                                 <input
                                                     name="period"
                                                     value={item.period}
@@ -277,8 +330,28 @@ const Invoice = ({ data, user, queryData }) => {
                                                     placeholder="Period"
                                                 />
                                             )}
-                                            {!showInputs && item.period}
+                                            {!showInputs && item.period} */}
+                                            <label className='pl-3 text-sm pl-[5px]' htmlFor="start">Start:</label>
+                                            <input
+                                                className='pl-[4px] text-sm'
+                                                type="date"
+                                                value={invoiceItems[0].period.startDate}
+                                                onChange={(event) => dateChangeHandler(event, 'startDate')}
+                                                id="start"
+                                                name="customDate"
+                                                min="2023-01-01" max="2024-01-01" />,
+
+                                            <label className='pl-2 text-sm pl-[5px]' htmlFor="end">End:</label>
+                                            <input
+                                                className='pl-1 text-sm pl-[4px]'
+                                                type="date"
+                                                value={invoiceItems[0].period.endDate}
+                                                onChange={(event) => dateChangeHandler(event, 'endDate')}
+                                                id="end"
+                                                name="customDate"
+                                                min="2023-01-01" max="2024-01-01" />
                                         </td>
+
                                         <td className="border px-4 py-2 text-right" style={{ padding: '0 0 0 0px' }}>
                                             {showInputs && (
                                                 <input
