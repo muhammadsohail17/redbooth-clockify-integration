@@ -1,96 +1,189 @@
+import React, { useState, useEffect } from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import PopUpModel from "@/components/PopUpModel";
+import * as Yup from "yup";
 import axios from "axios";
-import { useState } from "react";
-import Head from "next/head";
+import { useRouter } from "next/router";
+import { handleApiError } from "@/utils/handleApiError";
 
+const Signup = () => {
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false); // New state variable for checkbox
+  const [showModal, setShowModal] = useState(false); // State variable for modal visibility
+  const [modalMessage, setModalMessage] = useState(""); // State variable for modal message
+  const [isLoading, setIsLoading] = useState(false); //state varialble for loading...
 
+  const router = useRouter();
 
-export default function signup() {
-
-    const [message, setMessage] = useState({ status: null, text: "" })
-
-
-    async function handleSubmit(e) {
-        e.preventDefault();
-        const form = document.getElementById('registerForm');
-        const fieldNames = Array.from(form.elements).filter(element => element.type !== 'submit' && element.type !== 'button').map(element => element.name);
-        const fields = {};
-
-        for (const fieldName of fieldNames) {
-            fields[fieldName] = form.elements[fieldName].value;
-        }
-
-
-        try {
-            const result = await axios.post('/api/registerUser', fields);
-            console.log(result.data.message)
-            setMessage({ status: 1, text: result.data.message })
-            e.target.reset();
-
-        } catch (err) {
-            console.log(err);
-            console.log(err.response.data)
-            setMessage({ status: 0, text: err.response.data.error })
-        }
-
+  useEffect(() => {
+    if (isRegistered) {
+      // Redirect to the dashboard page after successful registration
+      router.push("/dashboard");
     }
-    return <>
-        <Head>
-            <title>Redbooth + Clockify Integration</title>
-        </Head>
-        <section className="py-24 lg:py-28 bg-gray-200 h-screen overflow-hidden">
-            <div className="container px-4 mx-auto">
-                <div className="max-w-3xl mx-auto">
-                    {message.status == 1 ? <h2 className="font-heading mb-4 text-6xl text-black tracking-tighter">Registration Successful!</h2>
-                        : <h2 className="font-heading mb-4 text-6xl text-black tracking-tighter">Create a free account</h2>}
-                    <p className=" text-xl text-black tracking-tight">Redbooth and Clockify integration.</p>
-                    {message ? (
-                        <div
-                            className={`flex items-center ${message.status == 0 && 'bg-red-500'} text-black text-sm font-bold px-4 py-3 mb-2`}
-                            role='alert'
-                        >
-                            <p>{`${message.status == 0 ? message.text : ""}`}</p>
-                        </div>
-                    ) : (
-                        ''
-                    )}
-                    {message.status == 1 ? <div><p className="mb-5 text-xl text-black tracking-tight">We kindly request you to check your email in order to verify your account.</p>
-                        <p className="mb-5 text-xl text-black tracking-tight">Thank you for creating an account with us! Verifying your account will enable you to access all the features and benefits our platform offers.</p>
-                        <p className="mb-5 text-xl text-black tracking-tight">If you cannot locate the verification email in your inbox, please take a moment to check your spam folder as well.</p>
-                        <p className="mb-5 text-xl text-black tracking-tight">Should you encounter any difficulties or have any questions, please don't hesitate to reach out to our support team. We are here to assist you every step of the way.</p>
-                        <p className="mb-5 text-xl text-black tracking-tight">Once again, we appreciate your choice to join our platform. We look forward to serving you!</p>
-                    </div>
-                        : <form onSubmit={handleSubmit} id="registerForm" className="flex flex-wrap -m-3">
-                            <div className="w-full md:w-1/2 p-3">
-                                <label className="block">
-                                    <input className="p-4 w-full text-gray-700 tracking-tight bg-white placeholder-light-gray-700 outline-none border border-gray-600 rounded-lg focus:border-indigo-500 transition duration-200" id="signUpInput1-1" name="fullname" type="text" placeholder="Full Name" required />
-                                </label>
-                            </div>
-                            <div className="w-full md:w-1/2 p-3">
-                                <label className="block">
-                                    <input className="p-4 w-full text-gray-700 tracking-tight bg-white placeholder-light-gray-700 outline-none border border-gray-600 rounded-lg focus:border-indigo-500 transition duration-200" id="signUpInput1-2" name="email" type="email" placeholder="Email Address" required />
-                                </label>
-                            </div>
-                            <div className="w-full md:w-1/2 p-3">
-                                <label className="block">
-                                    <input className="p-4 w-full text-gray-700 tracking-tight bg-white placeholder-light-gray-700 outline-none border border-gray-600 rounded-lg focus:border-indigo-500 transition duration-200" id="signUpInput1-3" name="password" type="password" placeholder="Password" required />
-                                </label>
-                            </div>
-                            <div className="w-full md:w-1/2 p-3">
-                                <label className="block">
-                                    <input className="p-4 w-full text-gray-700 tracking-tight bg-white placeholder-light-gray-700 outline-none border border-gray-600 rounded-lg focus:border-indigo-500 transition duration-200" id="signUpInput1-4" name="confirmpassword" type="password" placeholder="Confirm Password" required />
-                                </label>
-                            </div>
-                            <div className="w-full p-3">
-                                <button type="submit" className="inline-block mb-7 px-5 py-4 w-full text-white text-center font-semibold tracking-tight bg-indigo-500 hover:bg-indigo-600 rounded-lg focus:ring-4 focus:ring-indigo-300 transition duration-200" href="#">Create Account</button>
-                                <span className="font-medium text-black tracking-tight">
-                                    <span>Already have an account?</span>
-                                    <a className="text-red-500 hover:text-red-700 transition duration-200 ml-2" href="/login">Sign In</a>
-                                </span>
-                            </div>
-                        </form>}
+  }, [isRegistered]);
 
-                </div>
+  const initialValues = {
+    name: "",
+    email: "",
+    password: "",
+  };
+
+  const validationSchema = Yup.object({
+    name: Yup.string().required("Required"),
+    email: Yup.string().email("Invalid email address").required("Required"),
+    password: Yup.string()
+      .required("Required")
+      .min(8, "Password must be at least 8 characters long"),
+    acceptTerms: Yup.bool().oneOf(
+      [true],
+      "You must accept the terms and conditions."
+    ),
+  });
+
+  const handleSubmit = async (values) => {
+    setIsLoading(true);
+    try {
+      // Make the API call to localhost:3001/user/signup
+      await axios
+        .post("http://localhost:3001/user/signup", values)
+        .then((response) => {
+          console.log(response.data);
+          setIsLoading(false);
+          setShowModal(true);
+          setModalMessage("Registration successful!");
+          setIsRegistered(true);
+        });
+    } catch (error) {
+      setIsLoading(false);
+      const errorMessage = handleApiError(error);
+      setShowModal(true);
+      setModalMessage(errorMessage);
+    }
+  };
+
+  const closeModal = () => setShowModal(false);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 shadow-md rounded-md w-96">
+        <h2 className="text-2xl font-semibold text-center mb-4">Signup</h2>
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          <Form>
+            <div className="mb-4">
+              <label htmlFor="name">Name</label>
+              <Field
+                type="text"
+                id="name"
+                name="name"
+                className="block w-full border rounded py-2 px-3"
+              />
+              <ErrorMessage
+                name="name"
+                component="div"
+                className="text-red-500 text-sm mt-1"
+              />
             </div>
-        </section>
-    </>
-}
+            <div className="mb-4">
+              <label htmlFor="email">Email</label>
+              <Field
+                type="email"
+                id="email"
+                name="email"
+                className="block w-full border rounded py-2 px-3"
+              />
+              <ErrorMessage
+                name="email"
+                component="div"
+                className="text-red-500 text-sm mt-1"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="password">Password</label>
+              <Field
+                type="password"
+                id="password"
+                name="password"
+                className="block w-full border rounded py-2 px-3"
+              />
+              <ErrorMessage
+                name="password"
+                component="div"
+                className="text-red-500 text-sm mt-1"
+              />
+            </div>
+            {/* Checkbox for accepting terms */}
+            <div className="mb-4">
+              <label>
+                <Field
+                  type="checkbox"
+                  name="acceptTerms"
+                  checked={acceptTerms}
+                  onChange={() => setAcceptTerms(!acceptTerms)}
+                />
+                <span className="ml-2">I accept the terms and conditions.</span>
+              </label>
+              <ErrorMessage
+                name="acceptTerms"
+                component="div"
+                className="text-red-500 text-sm mt-1"
+              />
+            </div>
+
+            <div className="mb-4">
+              <button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+              >
+                {isLoading ? (
+                  <svg
+                    className="animate-spin h-5 w-5 mr-3"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 016 12H2c0 2.981 1.655 5.597 4 6.975V17zm10-5.291a7.962 7.962 0 01-2 5.291v-1.725c1.345-.378 2.3-1.494 2.4-2.766h-2.4zm-8-3.518v1.725c-1.345.378-2.3 1.494-2.4 2.766h2.4A7.962 7.962 0 016 11.709z"
+                    ></path>
+                  </svg>
+                ) : (
+                  <span>Sign Up</span>
+                )}
+              </button>
+            </div>
+          </Form>
+        </Formik>
+        <p className="text-sm text-gray-600">
+          Already have an account?{" "}
+          <a href="#" className="underline font-bold">
+            Login
+          </a>
+        </p>
+      </div>
+      {showModal && (
+        <PopUpModel
+          isOpen={showModal}
+          closeModal={closeModal}
+          title="Registration Status"
+          text={modalMessage}
+        />
+      )}
+    </div>
+  );
+};
+
+export default Signup;

@@ -5,8 +5,7 @@ import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 
 export default function Dashboard({ projects, userData, userLoggings, data }) {
-  console.log(projects);
-  console.log(data);
+  console.log("dashboard", projects, data);
   return (
     <>
       <Header />
