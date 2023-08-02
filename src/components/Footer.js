@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import connextarFavicon from "../resources/images/connextar-favicon.png";
 
 const Footer = () => {
@@ -52,7 +53,7 @@ const Footer = () => {
         <div className="mt-10 border-t border-gray-800 pt-4">
           <div className="flex items-center justify-between">
             <a href="#">
-              <img src={connextarFavicon} alt="logo" />
+              <Image src={connextarFavicon} alt="logo" />
             </a>
             <p className="text-sm">
               Copyright &copy; 2023 | Connextar Technologies
