@@ -17,7 +17,10 @@ const cxProjects = () => {
   return (
     <>
       <Header />
-      <div className="container mx-auto p-8">
+      <div className="container mx-auto px-4 py-4">
+      <h2 className="text-3xl font-semibold mb-4 mt-4 text-center">
+         Projects
+        </h2>
         <table className="w-full table-auto">
           <thead>
             <tr>
@@ -29,9 +32,9 @@ const cxProjects = () => {
           <tbody>
             {projects.map((project) => (
               <tr key={project._id}>
-                <td className="border px-4 py-2">{project.rbProjectId}</td>
-                <td className="border px-4 py-2">{project.name}</td>
-                <td className="border px-4 py-2">{project.description}</td>
+                <td className="border px-4 py-2 text-center">{project.rbProjectId}</td>
+                <td className="border px-4 py-2 text-center">{project.name}</td>
+                <td className="border px-4 py-2 text-center">{project.description}</td>
               </tr>
             ))}
           </tbody>
