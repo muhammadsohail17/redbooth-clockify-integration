@@ -20,10 +20,9 @@ export default async function handler(req, res) {
 
     await connectDB();
     const { month, year, userId, hourlyRate, invoiceNo } = req.body.queryData;
+    console.log("req.body.queryData", req.body.queryData)
     var data = await generateInvoiceData(month, year, userId, hourlyRate, invoiceNo);
 
-    console.log('req.body.invoiceDataa', req.body.invoiceData.renderedInvoiceData)
-    // const invoiceTemplate = fs.readFileSync('./src/data/invoiceTemplate.ejs', 'utf-8');
     const invoiceTemplate = fs.readFileSync('./src/data/template.ejs', 'utf-8');
     data.renderedInvoiceTemplate = ejs.render(invoiceTemplate, { data, invoiceData: req.body.invoiceData });
     // console.log('data.renderedInvoiceTemplate', data.renderedInvoiceTemplate)
