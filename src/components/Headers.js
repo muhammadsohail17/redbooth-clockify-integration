@@ -14,21 +14,23 @@ const Header = () => {
 
           {/* Navigation links */}
           <div className="hidden md:flex space-x-4">
-            <a href="/" className="text-white hover:text-gray-200">
+            <a href="/" className="text-white hover:text-gray-200 pt-2">
               Home
             </a>
-            <a href="/cx-users" className="text-white hover:text-gray-200">
+            <a href="/cx-users" className="text-white hover:text-gray-200 pt-2">
               Users
             </a>
-            <a href="/cx-projects" className="text-white hover:text-gray-200">
+            <a href="/cx-projects" className="text-white hover:text-gray-200 pt-2">
               Projects
             </a>
-            <a
-              href="/dashboard/generateInvoice"
-              className="text-white hover:text-gray-200"
-            >
-              Generate Invoice
-            </a>
+            <div className="flex space-x-4">
+              <a
+                href="/dashboard/generateInvoice"
+                className="text-white hover:text-gray-200 border border-gray-200 hover:border-gray-300 p-2 rounded-md text-sm"
+              >
+                Generate Invoice
+              </a>
+            </div>
           </div>
         </div>
       </div>
