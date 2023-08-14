@@ -17,18 +17,18 @@ const Sidebar = () => {
     <>
       {/* Button to toggle the sidebar */}
       <button
-        className="inline cursor-pointer absolute top-15 left-2 mt-2 p-2 text-white z-10"
+        className="fixed top-15 left-2 mt-2 p-2 text-white z-10"
         onClick={toggleSidebar}
       >
         {sidebarVisible ? (
           <FontAwesomeIcon icon={faBars} className="mr-2" />
         ) : (
-          <FontAwesomeIcon icon={faBars} className="mr-2  text-black" />
+          <FontAwesomeIcon icon={faBars} className="mr-2 bg-white text-black" />
         )}
       </button>
       {/* Sidebar */}
       {sidebarVisible && (
-        <div className="px-4 py-2 bg-gray-700 lg:w-1/5">
+        <div className="px-4 py-2 bg-indigo-600 lg:w-1/5">
           <div className="my-2">
             {/* Close button */}
             <button
@@ -48,7 +48,7 @@ const Sidebar = () => {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-9 ml-3 mb-4 inline text-white  hover:text-gray-400 cursor-pointer absolute bottom-0 left-0"
+                  className="w-9 ml-3 mb-4 inline text-white  hover:text-red-400 cursor-pointer absolute bottom-0 left-0"
                 >
                   <path
                     strokeLinecap="round"

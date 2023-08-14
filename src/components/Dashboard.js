@@ -1,11 +1,9 @@
 import React from "react";
-import { useState, useEffect } from "react";
 import { unixTimestampToDate } from "../data/util";
 import Header from "./Headers";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 import { useSession } from "next-auth/react";
-import Clockifydata from "./Clockifydata";
 
 export default function Dashboard({ data }) {
   const { data: session } = useSession();
@@ -22,7 +20,7 @@ export default function Dashboard({ data }) {
             {/* dashboard item One */}
             <div className="grid gap-4 lg:grid-cols-2">
               <div className="flex items-center px-4 py-6 bg-white rounded-md shadow-md">
-                <div className="p-3 bg-gray-800 rounded">
+                <div className="p-3 bg-indigo-600 rounded">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -39,12 +37,12 @@ export default function Dashboard({ data }) {
                   </svg>
                 </div>
                 <div className="mx-4">
-                  <h4 className="text-2xl font-semibold text-gray-700">35h</h4>
+                  <h4 className="text-2xl font-semibold text-gray-700">20</h4>
                   <div className="text-gray-500">Last Week Hours</div>
                 </div>
               </div>
               <div className="flex items-center px-4 py-6 bg-white rounded-md shadow-md">
-                <div className="p-3 bg-gray-800 rounded">
+                <div className="p-3 bg-indigo-600 rounded">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -76,13 +74,13 @@ export default function Dashboard({ data }) {
                   <table className="min-w-full">
                     <thead>
                       <tr>
-                        <th className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-800 uppercase border-b border-gray-200 bg-gray-50">
+                        <th className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50">
                           Project Name
                         </th>
-                        <th className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-800 uppercase border-b border-gray-200 bg-gray-50">
+                        <th className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50">
                           Week Ending
                         </th>
-                        <th className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-800 uppercase border-b border-gray-200 bg-gray-50">
+                        <th className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50">
                           Logged Hours
                         </th>
                       </tr>
@@ -116,7 +114,7 @@ export default function Dashboard({ data }) {
                                   </span>
                                 </td>
 
-                                <td className="px-6 py-4 text-left text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200 ">
+                                <td className="px-6 py-4 text-left text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200 text-center ">
                                   <span className="inline-flex px-2 text-xs font-semibold">
                                     {weeklyLogging.weeklyTotalLoggedHours}
                                   </span>
@@ -130,7 +128,6 @@ export default function Dashboard({ data }) {
                   </table>
                 </div>
               </div>
-              <Clockifydata />
             </div>
           </div>
         </div>
