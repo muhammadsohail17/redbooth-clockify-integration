@@ -169,7 +169,7 @@ const Signup = () => {
         </Formik>
         <p className="text-sm text-gray-600">
           Already have an account?{" "}
-          <a href="#" className="underline font-bold">
+          <a href="/login" className="underline font-bold">
             Login
           </a>
         </p>

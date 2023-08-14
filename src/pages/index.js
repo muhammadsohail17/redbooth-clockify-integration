@@ -1,15 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
-/**
- * Server side props function runs on serverside
- * Checks whether the user is logged in or not and takes appropriate action
- *
- * This is our root index page which redirects the user to appropriate link
- * This file will be executed if someone visits the app url without mentioning any specific path in there
- *
- * @param {*} param
- * @returns
- */
+
 export async function getServerSideProps(ctx) {
   // Get user session from the request headers
   const session = await getServerSession(ctx.req, ctx.res, authOptions);

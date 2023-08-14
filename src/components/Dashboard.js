@@ -3,15 +3,18 @@ import { unixTimestampToDate } from "../data/util";
 import Header from "./Headers";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
+import { useSession } from "next-auth/react";
 
-export default function Dashboard({ projects, userData, userLoggings, data }) {
-  console.log("dashboard", projects, data);
+export default function Dashboard({ data }) {
+  const { data: session } = useSession();
+  console.log("dashboard", data);
+  console.log("dashboard session", session);
   return (
     <>
       <Header />
       <div className="flex overflow-x-hidden min-h-screen">
         {/*Render sidebar component*/}
-        <Sidebar data={data} projects={projects} />
+        <Sidebar />
         <div className="w-full px-4 py-2 bg-gray-200 lg:w-full">
           <div className="container mx-auto mt-14">
             {/* dashboard item One */}
