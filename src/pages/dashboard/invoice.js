@@ -128,22 +128,50 @@ const Invoice = ({ data, user, queryData }) => {
     ////// Function to handle download invoice
 
 
-    const handleDownloadInvoice = async () => {
+    // const handleDownloadInvoice = async () => {
 
+    //     try {
+    //         const requestData = { queryData, invoiceData };
+    //         // Make the API call using Axios
+    //         const response = await axios.post('/api/generate', requestData);
+
+    //         // API call was successful, process the response here
+    //         console.log('API Response:', response);
+    //     } catch (error) {
+    //         // Handle errors if the API call was not successful
+    //         console.error('API Error:', error);
+    //     }
+    // };
+
+    const handleDownloadInvoice = async () => {
         try {
             const requestData = { queryData, invoiceData };
             // Make the API call using Axios
-            const response = await axios.post('/api/generate', requestData);
-
-            // API call was successful, process the response here
-            console.log('API Response:', response);
+            const response = await axios.post('/api/generate', requestData, { responseType: 'blob' });
+    
+            // Create a Blob object from the response data
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+    
+            // Create a URL for the Blob
+            const blobURL = URL.createObjectURL(blob);
+    
+            // Create a temporary link and trigger a click to initiate download
+            const link = document.createElement('a');
+            link.href = blobURL;
+            link.download = 'Invoice.pdf';
+            link.click();
+    
+            // Clean up the Blob URL
+            URL.revokeObjectURL(blobURL);
+    
+            // Log success
+            console.log('PDF Downloaded:', link.download);
         } catch (error) {
             // Handle errors if the API call was not successful
             console.error('API Error:', error);
         }
     };
-
-
+    
 
     ////// Mouse enter and leave event handlers for download email, and share buttons
 
@@ -229,36 +257,16 @@ const Invoice = ({ data, user, queryData }) => {
         console.log(newInvoiceItems);
     }
 
-    // function dateChangeHandler(field, event) {
-    //     const newInvoiceItems = [...invoiceItems];
-    //     if (field === 'startDate' || field === 'endDate') {
-    //         const newStartDate = field === 'startDate' ? event.target.value : newInvoiceItems[0].period.startDate;
-    //         const newEndDate = field === 'endDate' ? event.target.value : newInvoiceItems[0].period.endDate;
-    //         newInvoiceItems[0] = {
-    //             ...newInvoiceItems[0],
-    //             period: {
-    //                 ...newInvoiceItems[0].period,
-    //                 startDate: newStartDate,
-    //                 endDate: newEndDate,
-    //                 dateRange: `${newStartDate} to ${newEndDate}`,
-    //             },
-    //         };
-    //     }
-    //     console.log(newInvoiceItems);
-    // }
-
 
     return (
         <>
             {domLoaded && (
                 <>
-
-
                     <Head>
                         <title>Create Invoice</title>
                     </Head>
 
-                    <div id="invoice-container" className="container mx-auto p-4">
+                    <div id="invoice-container" className="container mx-auto p-4 mt-4">
                         <div className="flex justify-between">
                             <div>
                                 <h1 className="text-3xl font-bold mb-4">{user.name}</h1>
@@ -406,7 +414,7 @@ const Invoice = ({ data, user, queryData }) => {
 
                         {/*//////// Section for Confirm, Add, & Cancel buttons */}
 
-                        <div className="flex justify-end mt-4 py-4">
+                        <div className="flex justify-end mt-4 py-2">
 
                             {/* Confirm button */}
 
@@ -459,11 +467,11 @@ const Invoice = ({ data, user, queryData }) => {
 
                         {/* //////// Section for download, email, and share buttons */}
 
-                        <div className="inline float-right justify-end py-4 px-4 text-blue-400 hover:text-blue-600">
+                        <div className="inline float-right justify-end py-4 px-4 text-gray-500 hover:text-gray-800">
 
                             {/* Download button */}
 
-                            <button className="">
+                            <button className="relative text-gray-500 hover:text-gray-600 px-2">
                                 <svg
                                     onMouseEnter={handleDownloadMouseEnter}
                                     onMouseLeave={handleDownloadMouseLeave}
@@ -490,7 +498,7 @@ const Invoice = ({ data, user, queryData }) => {
 
                             {/* Email button */}
 
-                            {/* <button className="relative text-blue-400 hover:text-blue-600 px-4">
+                            <button className="relative text-gray-500 hover:text-gray-800 px-2">
                                 <svg
                                     onMouseEnter={handleEmailMouseEnter}
                                     onMouseLeave={handleEmailMouseLeave}
@@ -510,11 +518,11 @@ const Invoice = ({ data, user, queryData }) => {
                                         Email
                                     </span>
                                 )}
-                            </button> */}
+                            </button>
 
                             {/* Share button */}
 
-                            {/* <button className="relative">
+                            <button className="relative text-gray-500 hover:text-gray-800">
                                 <svg
                                     onMouseEnter={handleShareMouseEnter}
                                     onMouseLeave={handleShareMouseLeave}
@@ -538,7 +546,7 @@ const Invoice = ({ data, user, queryData }) => {
                                         Share
                                     </span>
                                 )}
-                            </button> */}
+                            </button>
                         </div>
                     </div>
                 </>
