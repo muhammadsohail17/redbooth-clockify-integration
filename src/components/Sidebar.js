@@ -2,13 +2,10 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { useSession } from "next-auth/react";
 
-const Sidebar = () => {
+const Sidebar = ({ data, projects }) => {
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
-  const { data: session } = useSession();
-  console.log("sidebar session", session);
   const toggleSidebar = () => {
     setSidebarVisible(!sidebarVisible);
   };
@@ -38,7 +35,7 @@ const Sidebar = () => {
               <FontAwesomeIcon icon={faTimes} size="lg" />
             </button>
             <h1 className="text-2xl font-bold text-white inline ml-4">
-              Welcome {session.user?.email}!
+              Welcome {data.name}!
             </h1>
             <Link href="api/auth/signout">
               <span>
@@ -59,11 +56,11 @@ const Sidebar = () => {
               </span>
             </Link>
           </div>
-          {/* {projects.map((project, id) => (
+          {projects.map((project, id) => (
             <h1 key={id} className="text-white text-2xl">
               {project.name}
             </h1>
-          ))} */}
+          ))}
         </div>
       )}
     </>

@@ -6,16 +6,14 @@ import Footer from "./Footer";
 import { useSession } from "next-auth/react";
 import Clockifydata from "./Clockifydata";
 
-export default function Dashboard({ data }) {
-  const { data: session } = useSession();
-  console.log("dashboard", data);
-  console.log("dashboard session", session);
+export default function Dashboard({ projects, userData, userLoggings, data }) {
+  console.log("dashboard", projects, data);
   return (
     <>
       <Header />
       <div className="flex overflow-x-hidden min-h-screen">
         {/*Render sidebar component*/}
-        <Sidebar />
+        <Sidebar data={data} projects={projects} />
         <div className="w-full px-4 py-2 bg-gray-200 lg:w-full">
           <div className="container mx-auto mt-14">
             {/* dashboard item One */}

@@ -1,8 +1,6 @@
 export const handleApiError = (error) => {
   const errorMessages = {
     201: "User account created successfully!",
-    400: "400 Bad Request",
-    401: "401 Unauthorized",
     404: "Resource not found. Please try again later.",
     409: "Email already exists. Please use a different email.",
     500: "Server error. Please try again later.",
