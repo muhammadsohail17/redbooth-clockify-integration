@@ -1,20 +1,18 @@
-import React from "react";
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { unixTimestampToDate } from "../data/util";
 import Header from "./Headers";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
+import { useSession } from "next-auth/react";
 import Clockifydata from "./Clockifydata";
 
-export default function Dashboard({ projects, userData, userLoggings, data }) {
-  console.log("dashboard", projects, data);
-
+export default function Dashboard() {
   return (
     <>
       <Header />
       <div className="flex overflow-x-hidden min-h-screen">
         {/*Render sidebar component*/}
-        <Sidebar data={data} projects={projects} />
+        <Sidebar />
         <div className="w-full px-4 py-2 bg-gray-200 lg:w-full">
           <div className="container mx-auto mt-14">
             {/* dashboard item One */}
@@ -60,7 +58,7 @@ export default function Dashboard({ projects, userData, userLoggings, data }) {
                 </div>
                 <div className="mx-4">
                   <h4 className="text-2xl font-semibold text-gray-700">
-                    {data.totalLoggedHours}
+                    {"data.totalLoggedHours"}
                   </h4>
                   <div className="text-gray-500">Current Month Hours</div>
                 </div>
@@ -87,48 +85,48 @@ export default function Dashboard({ projects, userData, userLoggings, data }) {
                     </thead>
 
                     <tbody className="bg-white">
-                      {data.loggingsData.map((project, id) => (
-                        <React.Fragment key={id}>
-                          {project.projectLoggingsData.map(
-                            (weeklyLogging, id) => (
-                              <tr key={id}>
-                                <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
-                                  <div className="flex items-center">
-                                    <div className="ml-4">
-                                      <div className="text-sm font-medium leading-5 text-gray-900">
-                                        {project.name}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </td>
+                      {/* {data.loggingsData.map((project, id) => ( */}
+                      <React.Fragment>
+                        {/* {project.projectLoggingsData.map(
+                          (weeklyLogging, id) => ( */}
+                        <tr>
+                          <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                            <div className="flex items-center">
+                              <div className="ml-4">
+                                <div className="text-sm font-medium leading-5 text-gray-900">
+                                  {"project.name"}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
 
-                                <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
-                                  <span className="inline-flex px-2 text-xs font-semibold leading-5 text-green-800">
-                                    {unixTimestampToDate(
-                                      weeklyLogging.rangeEnd
-                                    ).toLocaleDateString("en-US", {
-                                      month: "long",
-                                      day: "numeric",
-                                      year: "numeric",
-                                    })}
-                                  </span>
-                                </td>
+                          <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                            <span className="inline-flex px-2 text-xs font-semibold leading-5 text-green-800">
+                              {unixTimestampToDate(
+                                "weeklyLogging.rangeEnd"
+                              ).toLocaleDateString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
+                            </span>
+                          </td>
 
-                                <td className="px-6 py-4 text-left text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200 ">
-                                  <span className="inline-flex px-2 text-xs font-semibold">
-                                    {weeklyLogging.weeklyTotalLoggedHours}
-                                  </span>
-                                </td>
-                              </tr>
-                            )
-                          )}
-                        </React.Fragment>
-                      ))}
+                          <td className="px-6 py-4 text-left text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200 ">
+                            <span className="inline-flex px-2 text-xs font-semibold">
+                              {"weeklyLogging.weeklyTotalLoggedHours"}
+                            </span>
+                          </td>
+                        </tr>
+                        {/* )
+                        )} */}
+                      </React.Fragment>
+                      {/* ))} */}
                     </tbody>
                   </table>
                 </div>
               </div>
-              <Clockifydata/>
+              <Clockifydata />
             </div>
           </div>
         </div>

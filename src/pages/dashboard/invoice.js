@@ -245,7 +245,7 @@ const Invoice = ({ data, user, queryData }) => {
                 },
             };
         } else if (field === 'endDate') {
-
+            
             newInvoiceItems[0] = {
                 ...newInvoiceItems[0], period: {
                     ...newInvoiceItems[0].period,
@@ -272,7 +272,7 @@ const Invoice = ({ data, user, queryData }) => {
                                 <h1 className="text-3xl font-bold mb-4">{user.name}</h1>
                                 <hr className="border-double border-2 border-black mb-4" />
                                 <div className="mb-4">
-                                    <p className="font-bold py-2">Bill To :</p>
+                                    <p className="font-bold py-2">Bill To:</p>
                                     <span className="text-md">
                                         Connextar Technologies Ltd
                                         <br />
@@ -282,10 +282,10 @@ const Invoice = ({ data, user, queryData }) => {
                                     </span>
                                 </div>
                             </div>
-                            <div className='text-right flex flex-col justify-end mb-[110px]'>
-                                <p className="font-semibold py-0 text-left">Invoice Number : # {data.invoiceNo}</p>
-                                <p className="font-semibold py-1 text-left">Issue Date : {data.invoiceDate}</p>
-                                <p className="font-semibold py-0 text-left">Due Date : {data.invoiceDueDate}</p>
+                            <div className='text-right flex flex-col justify-end mb-[16px]'>
+                                <p className="font-semibold py-0 text-left">Invoice Number: # {data.invoiceNo}</p>
+                                <p className="font-semibold py-1 text-left">Issue Date: {data.invoiceDate}</p>
+                                <p className="font-semibold py-0 text-left">Due Date: {data.invoiceDueDate}</p>
                             </div>
                         </div>
                         <table className="N01 w-full mt-8">
@@ -306,7 +306,7 @@ const Invoice = ({ data, user, queryData }) => {
                                             <td className="border px-6 py-2 text-center pl-2.5 pr-2.5">{invoiceItem.period}</td>
                                             <td className="border px-8 py-2 text-center">{data.currency} {invoiceItem.rate}</td>
                                             <td className="border px-8 py-2 text-center">{invoiceItem.hours}</td>
-                                            <td className="border px-8 py-2 text-center">{data.currency} {parseFloat(invoiceItem.charges).toFixed(2)}</td>
+                                            <td className="border px-8 py-2 text-center">{data.currency} {invoiceItem.charges}</td>
                                         </tr> : ''
                                 ))}
 
@@ -339,7 +339,7 @@ const Invoice = ({ data, user, queryData }) => {
                                                 />
                                             )}
                                             {!showInputs && item.period} */}
-                                            <label className='text-sm pl-[5px]' htmlFor="start">Start:</label>
+                                            <label className='pl-3 text-sm pl-[5px]' htmlFor="start">Start:</label>
                                             <input
                                                 className='pl-[4px] text-sm'
                                                 type="date"
@@ -349,9 +349,9 @@ const Invoice = ({ data, user, queryData }) => {
                                                 name="customDate"
                                                 min="2023-01-01" max="2024-01-01" />,
 
-                                            <label className='text-sm pl-[5px]' htmlFor="end">End:</label>
+                                            <label className='pl-2 text-sm pl-[5px]' htmlFor="end">End:</label>
                                             <input
-                                                className='text-sm pl-[4px]'
+                                                className='pl-1 text-sm pl-[4px]'
                                                 type="date"
                                                 value={invoiceItems[0].period.endDate}
                                                 onChange={(event) => dateChangeHandler(event, 'endDate')}
@@ -400,7 +400,7 @@ const Invoice = ({ data, user, queryData }) => {
 
                                 <tr>
                                     <td className="border px-4 py-2 font-bold" colSpan="2"></td>
-                                    <td className="border px-6 py-2 font-bold text-center">Total :</td>
+                                    <td className="border px-6 py-2 font-bold text-center">Total:</td>
                                     <td className="border px-8 py-2 font-bold text-center">
                                         {formatNumber(updatedTotalHours.toFixed(2))}
                                     </td>
@@ -451,7 +451,7 @@ const Invoice = ({ data, user, queryData }) => {
                             <table>
                                 <tbody>
                                     <tr>
-                                        <td className="pr-2 font-bold">Balance Due :</td>
+                                        <td className="pr-2 font-bold">Balance Due:</td>
                                         <td className="font-bold">
                                             {data.currency}
                                             {formatNumber((data.monthlyTotals + invoiceItems.reduce((total, item) => {

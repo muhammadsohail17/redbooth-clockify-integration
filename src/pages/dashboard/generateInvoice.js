@@ -124,7 +124,7 @@ export default function GenerateInvoice({ user }) {
 
                         <button
                             type="submit"
-                            className="w-full py-3 px-4 text-white bg-gray-800 hover:bg-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full py-3 px-4 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
                             Generate Invoice
                         </button>

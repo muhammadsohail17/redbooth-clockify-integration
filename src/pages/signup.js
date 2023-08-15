@@ -23,12 +23,14 @@ const Signup = () => {
   }, [isRegistered]);
 
   const initialValues = {
+    rbUserId: "",
     name: "",
     email: "",
     password: "",
   };
 
   const validationSchema = Yup.object({
+    rbUserId: Yup.string().required("Required"),
     name: Yup.string().required("Required"),
     email: Yup.string().email("Invalid email address").required("Required"),
     password: Yup.string()
@@ -73,6 +75,20 @@ const Signup = () => {
           onSubmit={handleSubmit}
         >
           <Form>
+            <div className="mb-4">
+              <label htmlFor="rbUserId">RB User ID</label>
+              <Field
+                type="text"
+                id="rbUserId"
+                name="rbUserId"
+                className="block w-full border rounded py-2 px-3"
+              />
+              <ErrorMessage
+                name="rbUserId"
+                component="div"
+                className="text-red-500 text-sm mt-1"
+              />
+            </div>
             <div className="mb-4">
               <label htmlFor="name">Name</label>
               <Field
@@ -169,7 +185,7 @@ const Signup = () => {
         </Formik>
         <p className="text-sm text-gray-600">
           Already have an account?{" "}
-          <a href="#" className="underline font-bold">
+          <a href="/login" className="underline font-bold">
             Login
           </a>
         </p>
