@@ -1,6 +1,6 @@
 <script src="https://cdn.tailwindcss.com"></script>
 
-<div id="invoice-container" class="container mx-auto p-4">
+<div id="invoice-container" class="container mx-auto p-4 mt-4">
     <div class="flex justify-between">
         <div>
             <h1 class="text-3xl font-bold mb-4">
@@ -8,7 +8,7 @@
             </h1>
             <hr class="border-double border-2 border-black mb-4" />
             <div class="mb-4">
-                <p class="font-bold py-2">Bill To:</p>
+                <p class="font-bold py-2">Bill To :</p>
                 <span class="text-md">
                     Connextar Technologies Ltd
                     <br />
@@ -18,12 +18,12 @@
                 </span>
             </div>
         </div>
-        <div class='text-right flex flex-col justify-end mb-[16px]'>
-            <p class="font-semibold py-0 text-left">Invoice Number: # <%=data.invoiceNo%>
+        <div class='text-right flex flex-col justify-end mb-[110px]'>
+            <p class="font-semibold py-0 text-left">Invoice Number : # <%=data.invoiceNo%>
             </p>
-            <p class="font-semibold py-1 text-left">Issue Date: <%=data.invoiceDate%>
+            <p class="font-semibold py-1 text-left">Issue Date : <%=data.invoiceDate%>
             </p>
-            <p class="font-semibold py-0 text-left">Due Date: <%=data.invoiceDueDate%>
+            <p class="font-semibold py-0 text-left">Due Date : <%=data.invoiceDueDate%>
             </p>
         </div>
     </div>
@@ -73,7 +73,7 @@
                                                 <%= item.project %>
                                             </td>
                                             <td class="border px-6 py-2 text-center pl-2.5 pr-2.5">
-                                                <% if (typeof item.period == 'object' ) { %>
+                                                <% if (typeof item.period=='object' ) { %>
                                                     <%= item.period.startDate %> To <%= item.period.endDate %>
                                                             <% } %>
 
@@ -96,7 +96,7 @@
         </tbody>
     </table>
 
-    <div class="flex justify-end mt-2">
+    <div class="flex justify-end mt-8">
         <table>
             <tbody>
                 <tr>
