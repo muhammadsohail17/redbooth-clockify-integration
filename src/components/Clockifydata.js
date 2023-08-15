@@ -14,7 +14,7 @@ const Clockifydata = () => {
     axios
       .get("http://localhost:3001/generate-weekly-summary")
       .then((response) => {
-        console.log(response.data.data);
+        console.log("generate-weekly-summary", response.data);
         setClockifyData(response.data.data);
       })
       .catch((error) => {
@@ -89,23 +89,25 @@ const Clockifydata = () => {
                     Logged Hours
                   </th>
                 </tr>
-                {data.map((data) => (
-                  <tr key={data}>
+              </thead>
+              <tbody>
+                {data.map((item) => (
+                  <tr key={item._id}>
                     <th className="px-8 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 border-b border-gray-200">
-                      {data.Project}
+                      {item.Project}
                     </th>
                     <th className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-center text-gray-500 border-b border-gray-200">
-                      {data.User}
+                      {item.User}
                     </th>
                     <th className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-center text-gray-500 border-b border-gray-200">
-                      {data.Week}
+                      {item.Week}
                     </th>
                     <th className="px-8 py-3 text-xs font-medium leading-4 tracking-wider text-center text-gray-500 border-b border-gray-200">
-                      {formatTime(data["Time (decimal)"])}
+                      {formatTime(item["Time (decimal)"])}
                     </th>
                   </tr>
                 ))}
-              </thead>
+              </tbody>
             </table>
           </div>
         </div>

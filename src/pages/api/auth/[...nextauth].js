@@ -8,6 +8,7 @@ export const authOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
+        rbUserId: { label: "RB USER ID", type: "number" },
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
@@ -19,6 +20,7 @@ export const authOptions = {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            rbUserId: credentials?.rbUserId,
             email: credentials?.email,
             password: credentials?.password,
           }),
@@ -37,6 +39,10 @@ export const authOptions = {
   ],
   callbacks: {
     async session({ session, token, user }) {
+      // You can access the rbUserId from the user object
+      if (user && user.rbUserId) {
+        session.rbUserId = user.rbUserId;
+      }
       session.user = token;
       return session;
     },

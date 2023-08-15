@@ -32,11 +32,13 @@ const Login = () => {
   console.log("login session", session);
 
   const initialValues = {
+    rbUserId: "",
     email: "",
     password: "",
   };
 
   const validationSchema = Yup.object({
+    rbUserId: Yup.string().required("Required"),
     email: Yup.string().email("Invalid email address").required("Required"),
     password: Yup.string().required("Required"),
   });
@@ -85,6 +87,20 @@ const Login = () => {
         >
           <Form>
             <div className="mb-4">
+              <label htmlFor="rbUserId">RB User ID</label>
+              <Field
+                type="text"
+                id="rbUserId"
+                name="rbUserId"
+                className="block w-full border rounded py-2 px-3"
+              />
+              <ErrorMessage
+                name="rbUserId"
+                component="div"
+                className="text-red-500 text-sm mt-1"
+              />
+            </div>
+            <div className="mb-4">
               <label htmlFor="email">Email</label>
               <Field
                 type="email"
@@ -115,6 +131,7 @@ const Login = () => {
             </div>
 
             <div className="mb-4 flex justify-end item-center">
+              {/* forgot password link */}
               <Link href="/forgot-password">
                 <span className="text-blue-500 hover:underline cursor-pointer">
                   Forgot Password?
