@@ -5,8 +5,42 @@ import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 import { useSession } from "next-auth/react";
 import Clockifydata from "./Clockifydata";
+import axios from "axios";
 
-export default function Dashboard() {
+
+export default function Dashboard({ projects, userData, userLoggings, data }) {
+  console.log("dashboard", projects, data);
+
+const [showPopup, setShowPopup] = useState(false); // State for popup visibility
+const [item, setClockifyData] = useState([]);
+
+
+const togglePopup = () => {
+  setShowPopup(!showPopup);
+};
+
+useEffect(() => {
+  // Make the GET request to the API endpoint
+  axios
+      .get("http://localhost:3001/generate-weekly-summary")
+      .then((response) => {
+          console.log(response.data.data);
+          setClockifyData(response.data.data);
+      })
+      .catch((error) => {
+          console.error("Error fetching data:", error);
+      });
+}, []);
+
+function formatTime(decimalTime) {
+  const hours = Math.floor(decimalTime);
+  const minutes = Math.round((decimalTime - hours) * 60);
+
+  return `${hours}h ${minutes}m`;
+}
+
+
+
   return (
     <>
       <Header />
@@ -112,11 +146,13 @@ export default function Dashboard() {
                             </span>
                           </td>
 
-                          <td className="px-6 py-4 text-left text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200 ">
-                            <span className="inline-flex px-2 text-xs font-semibold">
-                              {"weeklyLogging.weeklyTotalLoggedHours"}
-                            </span>
-                          </td>
+                          <td className="px-6 py-4 text-left text-sm leading-5 text-gray-800 whitespace-no-wrap border-b border-gray-200 bg-gray-50">
+                                  <div className="flex items-center cursor-pointer" onClick={togglePopup}>
+                                    <span className="inline-flex px-2 text-xs font-semibold">
+                                      {"weeklyLogging.weeklyTotalLoggedHours"}
+                                    </span>
+                                  </div>
+                                </td>
                         </tr>
                         {/* )
                         )} */}
@@ -128,6 +164,68 @@ export default function Dashboard() {
               </div>
               <Clockifydata />
             </div>
+            {/* Popup */}
+            {showPopup && (
+              <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                {/* Your popup content */}
+                <div className="bg-white p-4 rounded-md">
+                  <h1 className="text-center mb-4 text-black font-semibold">Discrepancies between time logged RB / CF</h1>
+
+                  <thead>
+                    <tr>
+                      <th className="px-6 py-2 text-xs font-medium leading-4 tracking-wider text-center text-gray-800 border-b border-gray-200 bg-gray-50">
+                        Redbooth Logged Hours
+                      </th>
+                      <th className="px-6 py-2 text-xs font-medium leading-4 tracking-wider text-center text-gray-800 border-b border-gray-200 bg-gray-50">
+                        {/* {data.loggingsData.map((project, id) => ( */}
+                          <React.Fragment >
+                            {/* {project.projectLoggingsData.map(
+                              (weeklyLogging, id) => (
+                                <tr key={id}>
+                                  {unixTimestampToDate(
+                                    weeklyLogging.rangeEnd
+                                  ).toLocaleDateString("en-US", {
+                                    month: "long",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}
+                                </tr>
+                              )
+                            )} */}
+                            35h
+                          </React.Fragment>
+                        {/* ))} */}
+
+                      </th>
+                    </tr>
+                  </thead>
+                  <thead>
+                    <tr>
+                      <th className="px-6 py-2 text-xs font-medium leading-4 tracking-wider text-left text-gray-800 border-b border-gray-200 bg-gray-50">
+                        Clockify Logged Hours
+                      </th>
+                      <th className="px-6 py-2 text-xs font-medium leading-4 tracking-wider text-center text-gray-800 border-b border-gray-200 bg-gray-50">
+                        {/* {item.map((data) => (
+                          <tr key={data}>
+                          {formatTime(data['Time (decimal)'])}
+                          </tr>
+                        ))} */}
+                        35h 04m
+                      </th>
+                    </tr>
+                  </thead>
+                  {/* ... Add your popup content here ... */}
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <button
+                      onClick={togglePopup}
+                      className="mt-4 px-2 py-1 bg-gray-600 hover:bg-gray-800 text-white rounded-md"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
