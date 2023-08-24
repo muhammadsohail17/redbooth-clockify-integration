@@ -1,5 +1,5 @@
-import Head from "next/head";
 import React from "react";
+import Head from "next/head";
 import Dashboard from "../../components/Dashboard";
 
 export default function Home() {
@@ -8,7 +8,6 @@ export default function Home() {
       <Head>
         <title>Dashboard</title>
       </Head>
-
       <Dashboard />
     </>
   );
