@@ -11,32 +11,29 @@ import {
   faTrash,
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
-import { PDFDocument, rgb } from "pdf-lib";
+import axios from "axios";
 
 const Invoice = () => {
   const [customItems, setCustomItems] = useState([]);
 
   const router = useRouter();
-  const invoiceItemString = router.query.invoice_item;
+  const invoiceItemString = router.query.invoice_data;
 
-  let invoiceItem = null;
+  let invoiceData = null;
 
   if (invoiceItemString) {
     try {
-      invoiceItem = JSON.parse(decodeURIComponent(invoiceItemString));
-      console.log("invoice_item ", invoiceItem);
+      invoiceData = JSON.parse(decodeURIComponent(invoiceItemString));
     } catch (error) {
       console.error("Error parsing invoice_item JSON:", error);
     }
   }
 
   const addCustomItem = () => {
-    console.log("Adding custom item...");
     const newCustomItem = {
       customItem: "Custom item",
       customValue: 0.0,
     };
-
     setCustomItems([...customItems, newCustomItem]);
   };
 
@@ -61,7 +58,7 @@ const Invoice = () => {
 
   const calculateMonthlyTotal = () => {
     const monthlyTotal =
-      parseFloat(invoiceItem.monthlyTotals) +
+      parseFloat(invoiceData.invoice_item.monthlyTotals) +
       customItems.reduce((acc, item) => acc + parseFloat(item.customValue), 0);
 
     return monthlyTotal.toFixed(2);
@@ -69,6 +66,33 @@ const Invoice = () => {
 
   const downloadPDF = async () => {
     console.log("createPDF clicked");
+    axios({
+      url: "http://localhost:3001/invoice/generate-invoice/pdf",
+      method: "POST",
+      data: invoiceData.invoice,
+      responseType: "blob",
+    })
+      .then((res) => {
+        const blob = new Blob([res.data], { type: "application/pdf" });
+        const href = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = href;
+        link.setAttribute(
+          "download",
+          `${invoiceData.invoice_item.name}_Invoice_${new Date()
+            .toISOString()
+            .slice(0, 10)}.pdf`
+        );
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        URL.revokeObjectURL(href);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -84,27 +108,32 @@ const Invoice = () => {
             <a href="/">
               <Image src={connextar_logo} alt="logo" />
             </a>
-            <h1 className="text-2xl font-bold my-4">{invoiceItem.name}</h1>
+            <h1 className="text-2xl font-bold my-4">
+              {invoiceData.invoice_item.name}
+            </h1>
 
             <div className="mb-4">
               <p className="font-bold py-2">Bill To:</p>
               <span className="text-md">
-                {invoiceItem.companyName}
+                {invoiceData.invoice_item.companyName}
                 <br />
-                {invoiceItem.companyAddress}
+                {invoiceData.invoice_item.companyAddress}
                 <br />
               </span>
             </div>
           </div>
           <div className="text-right flex flex-col justify-end mb-[16px]">
-            <p className="font-semibold py-0 text-left">
-              Invoice Number: # {"invoice No"}
+            <p className="font-normal py-0 text-left">
+              <span className="font-semibold">Invoice Number: #</span>
+              {invoiceData.invoice.invoiceNo}
             </p>
-            <p className="font-semibold py-1 text-left">
-              Date: {invoiceItem.invoiceDate}
+            <p className="font-normal py-1 text-left">
+              <span className="font-semibold">Date:</span>{" "}
+              {invoiceData.invoice_item.invoiceDate}
             </p>
-            <p className="font-semibold py-0 text-left">
-              Due Date: {invoiceItem.invoiceDueDate}
+            <p className="font-normal py-0 text-left">
+              <span className="font-semibold">Due Date:</span>{" "}
+              {invoiceData.invoice_item.invoiceDueDate}
             </p>
           </div>
         </div>
@@ -121,7 +150,7 @@ const Invoice = () => {
             </tr>
           </thead>
           <tbody>
-            {invoiceItem.loggingsData.map((logData, logIndex) => (
+            {invoiceData.invoice_item.loggingsData.map((logData, logIndex) => (
               <React.Fragment key={logIndex}>
                 {logData.projectLoggingsData.map(
                   (projectData, projectIndex) => (
@@ -133,7 +162,7 @@ const Invoice = () => {
                         {projectData.range}
                       </td>
                       <td className="border px-8 py-2 text-center">
-                        {invoiceItem.currency}
+                        {invoiceData.invoice_item.currency}
                         {projectData.hourlyRate}
                       </td>
                       <td className="border px-8 py-2 text-center">
@@ -181,24 +210,23 @@ const Invoice = () => {
                     </td>
                   </tr>
                 ))}
-
-                {/*Total*/}
-                <tr>
-                  <td className=" px-6 py-2 text-center pl-2.5 pr-2.5"></td>
-                  <td className=" px-8 py-2 text-center"></td>
-                  <td className=" px-8 py-2 text-center"></td>
-                  <td className=" pl-10 py-2 text-center font-semibold">
-                    Monthly Total
-                  </td>
-                  <td className="px-8 py-2 text-center font-bold">
-                    {invoiceItem.currency}
-                    {calculateMonthlyTotal()}
-                  </td>
-                </tr>
               </React.Fragment>
             ))}
           </tbody>
         </table>
+
+        {/*Total*/}
+        <div className="text-right flex flex-col justify-end my-8">
+          <p className="font-bold">
+            <span className="font-semibold">Total Logged Hours: </span>
+            {invoiceData.invoice_item.totalLoggedHours.toFixed(2)}
+          </p>
+          <p className="font-bold">
+            <span className="font-semibold">Monthly Total: </span>{" "}
+            {invoiceData.invoice_item.currency} {calculateMonthlyTotal()}
+          </p>
+        </div>
+
         {/* Button for adding custom items */}
         <button
           className="bg-gray-700 hover:bg-gray-800 text-white py-1 px-2 rounded mr-2"

@@ -14,7 +14,7 @@ export default function GenerateInvoice() {
   const router = useRouter();
 
   const authToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1zb2hhaWxraGFuLnNlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjY0ZGI1MjFjYWZmMWNlMzI0NjAyYzg1ZSIsImlhdCI6MTY5MjM0MzU3OSwiZXhwIjoxNjkyMzQ3MTc5fQ.BsdY_dS559CTTC8921ovYCcpD91Oec0rMfCtWtSOoI0";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1zb2hhaWxraGFuLnNlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjY0ZGI1MjFjYWZmMWNlMzI0NjAyYzg1ZSIsImlhdCI6MTY5Mjg2NjE1MSwiZXhwIjoxNjkyODY5NzUxfQ.u6sEhtCmxC7bPOLRib8J4DHKU-0_LbZTt1HBFIhbBzM";
 
   const initialValues = {
     userId: "",
@@ -49,10 +49,9 @@ export default function GenerateInvoice() {
       );
       console.log("Invoice generated successfully:", response.data);
       // Redirect to another page with invoiceItem as query parameter
-      console.log("Invoice item value:", response.data.invoice_item);
       router.push({
         pathname: "/dashboard/invoice",
-        query: { invoice_item: JSON.stringify(response.data.invoice_item) },
+        query: { invoice_data: JSON.stringify(response.data) },
       });
     } catch (error) {
       console.error("Error generating invoice:", error);
@@ -198,7 +197,7 @@ export default function GenerateInvoice() {
               </div>
               <button
                 type="submit"
-                className="w-full py-3 px-4 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full py-3 px-4 text-white bg-gray-600 hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
               >
                 Generate Invoice
               </button>
