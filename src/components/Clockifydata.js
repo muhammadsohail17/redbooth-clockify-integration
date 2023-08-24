@@ -1,5 +1,7 @@
 import { React, useEffect, useState } from "react";
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
 const Clockifydata = () => {
   const [isClockifyDataVisible, setIsClockifyDataVisible] = useState(false);
@@ -48,20 +50,10 @@ const Clockifydata = () => {
                   isClockifyDataVisible ? "rotate-[-180deg]" : ""
                 }`}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className={`h-6 w-6 text-gray-600`}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
+                <FontAwesomeIcon
+                  icon={faChevronUp}
+                  className="mr-2 text-gray-500"
+                />
               </span>
             </button>
           </h2>
@@ -76,16 +68,16 @@ const Clockifydata = () => {
             <table className="min-w-full">
               <thead>
                 <tr>
-                  <th className="px-8 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-900 uppercase border-b border-gray-200 bg-gray-50">
+                  <th className="px-8 py-3 text-s font-medium leading-4 tracking-wider text-left text-gray-900 uppercase border-b border-gray-200 bg-gray-50">
                     Project Name
                   </th>
-                  <th className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-center text-gray-900 uppercase border-b border-gray-200 bg-gray-50">
+                  <th className="px-6 py-3 text-s font-medium leading-4 tracking-wider text-center text-gray-900 uppercase border-b border-gray-200 bg-gray-50">
                     User Name
                   </th>
-                  <th className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-center text-gray-900 uppercase border-b border-gray-200 bg-gray-50">
+                  <th className="px-6 py-3 text-s font-medium leading-4 tracking-wider text-center text-gray-900 uppercase border-b border-gray-200 bg-gray-50">
                     Week Ending
                   </th>
-                  <th className="px-8 py-3 text-xs font-medium leading-4 tracking-wider text-center text-gray-900 uppercase border-b border-gray-200 bg-gray-50">
+                  <th className="px-8 py-3 text-s font-medium leading-4 tracking-wider text-center text-gray-900 uppercase border-b border-gray-200 bg-gray-50">
                     Logged Hours
                   </th>
                 </tr>
@@ -93,16 +85,16 @@ const Clockifydata = () => {
               <tbody>
                 {data.map((item) => (
                   <tr key={item._id}>
-                    <th className="px-8 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 border-b border-gray-200">
+                    <th className="px-8 py-3 text-s font-normal leading-4 tracking-wider text-left text-gray-500 border-b border-gray-200">
                       {item.Project}
                     </th>
-                    <th className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-center text-gray-500 border-b border-gray-200">
+                    <th className="px-6 py-3 text-s font-normal leading-4 tracking-wider text-center text-gray-500 border-b border-gray-200">
                       {item.User}
                     </th>
-                    <th className="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-center text-gray-500 border-b border-gray-200">
+                    <th className="px-6 py-3 text-s font-normal leading-4 tracking-wider text-center text-gray-500 border-b border-gray-200">
                       {item.Week}
                     </th>
-                    <th className="px-8 py-3 text-xs font-medium leading-4 tracking-wider text-center text-gray-500 border-b border-gray-200">
+                    <th className="px-8 py-3 text-s font-normal leading-4 tracking-wider text-center text-gray-500 border-b border-gray-200">
                       {formatTime(item["Time (decimal)"])}
                     </th>
                   </tr>
