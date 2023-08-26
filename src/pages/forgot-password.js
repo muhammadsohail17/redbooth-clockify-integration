@@ -1,152 +1,218 @@
-import Head from "next/head";
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { registerUser } from "@/data/dataModel";
 import Router from "next/router";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import Head from "next/head";
+import PopUpModel from "@/components/PopUpModel";
 
-export async function getServerSideProps(ctx) {
-    const session = await getServerSession(ctx.req, ctx.res, authOptions);
+const ForgotPassword = () => {
+  const [email, setEmail] = useState("");
+  const [resetToken, setResetToken] = useState(""); // To store the reset token
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value);
+  };
 
-    if (session) {
-        return {
-            redirect: { destination: '/dashboard' },
-            props: {}
+  const handleNewPasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
+
+  const handleConfirmPasswordChange = (event) => {
+    setConfirmPassword(event.target.value);
+  };
+
+  const handleResetSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/user/forgot-password",
+        {
+          email: email,
         }
-    } else {
-        const { token, email } = ctx.query;
-        let resetPassword = false;
-        let emailForReset = null; // Assign a default value of null
+      );
+      console.log("forgot password response:", response.data);
 
-        if (token) {
-            const user = await registerUser.findOne({ verificationToken: token });
-            if (user) {
-                resetPassword = true;
-                user.verificationToken = false;
-                await user.save();
-            }
-        }
-
-        if (email) {
-            emailForReset = email; // Assign the value of `email` to `emailForReset`
-        }
-
-        return {
-            props: {
-                resetPassword,
-                emailForReset,
-            },
-        };
+      setResetToken(response.data.resetToken);
+    } catch (error) {
+      console.log("An error occurred. Please try again later.");
     }
-}
+  };
 
-
-
-export default function sendLink({ resetPassword, emailForReset }) {
-    const [email, setEmail] = useState('');
-    const [message, setMessage] = useState({ status: null, text: "" });
-    const [password, setPassword] = useState();
-    const [confirmPassword, setConfirmPassword] = useState();
-
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-
-        try {
-            const result = await axios.post('/api/sendlink', { email: email });
-            console.log(result);
-            setMessage({ status: 1, text: result.data })
-            console.log(message)
-        } catch (error) {
-            console.log(error); // Log the error on the frontend
-            // Pass the error back to the backend
-            // axios.post('/api/error', { error: error.message });
+  const handlePasswordResetSubmit = async (event) => {
+    event.preventDefault();
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/user/reset-password",
+        {
+          email: email,
+          token: resetToken,
+          password: password,
+          confirmPassword: confirmPassword,
         }
-    };
-
-    const handlePasswordSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const result = await axios.post('/api/resetPassword', { password, confirmPassword, emailForReset })
-            console.log(result)
-            if (result.data.status == 1) {
-                Router.replace('/login')
-            } else {
-                setMessage({ status: 0, text: result.data.message });
-            }
-        } catch (error) {
-            console.log(error)
-            // setMessage({ status: 0, text:  })
-        }
-
+      );
+      setShowModal(true);
+      setModalMessage(
+        response.data.status === 1
+          ? "Password reset successful!"
+          : "Invalid password"
+      );
+      if (response.data.status == 1) {
+        Router.replace("/dashboard");
+      }
+    } catch (error) {
+      setShowModal(true);
+      setModalMessage("Password and confirm password do not match!");
+    } finally {
+      setIsLoading(false);
     }
+  };
 
+  const closeModal = () => setShowModal(false);
 
-
-    return <>
-        <Head>
-            <title>Redbooth + Clockify Integration</title>
-        </Head>
-        <section className="py-24 lg:py-28 bg-gray-200 h-screen overflow-hidden">
-            <div className="container px-4 mx-auto">
-                <div className="max-w-3xl mx-auto">
-                    {resetPassword ? <div>
-                        <h2 className="font-serif m-2 text-4xl text-black tracking-tighter">Choose a new password</h2>
-                        <form onSubmit={handlePasswordSubmit}>
-                            <div className="w-full md:w-1/2 p-3">
-                                {message ? (
-                                    <div
-                                        className={`flex items-center ${message.status == 0 && 'bg-red-500'} text-black text-sm font-bold px-4 py-3 mb-2`}
-                                        role='alert'
-                                    >
-                                        <p>{`${message.status == 0 ? message.text : ""}`}</p>
-                                    </div>
-                                ) : (
-                                    ''
-                                )}
-                                <label className="block">
-                                    <input onChange={(e) => setPassword(e.target.value)} name="password" className="p-4 w-full text-gray-700 tracking-tight bg-white placeholder-gray-700 outline-none border border-gray-600 placeholder-light-gray-700 rounded-lg focus:border-indigo-500 transition duration-200" id="password" type="password" placeholder="Password" required />
-                                </label>
-                            </div>
-                            <div className="w-full md:w-1/2 p-3">
-                                <label className="block">
-                                    <input onChange={(e) => setConfirmPassword(e.target.value)} name="confirmpassword" className="p-4 w-full text-gray-700 tracking-tight bg-white placeholder-gray-700 outline-none border border-gray-600 placeholder-light-gray-700 rounded-lg focus:border-indigo-500 transition duration-200" id="confirmpassword" type="password" placeholder="Confirm Password" required />
-                                </label>
-                            </div>
-
-                            <div className="w-full md:w-1/2 p-3">
-                                <button type="submit" className="p-4 w-full text-white font-semibold  bg-indigo-500 hover:bg-indigo-600 outline-none border border-gray-600 rounded-lg focus:border-indigo-500 transition duration-200">Reset</button>
-                            </div>
-                        </form>
-                    </div> : <div>{
-                        message.status == 1 ? <div><h4 className="font-serif mb-4 text-5xl text-black tracking-tighter">Reset Link Sent!</h4>
-                            `<p className="mb-7 text-xl text-black tracking-tight">If the email address <strong>{email}</strong> is registered, an email will be sent to you with instructions on how to retrieve your password.</p>`
-                            <p className="mb-7 text-xl text-black tracking-tight">Additionally, please remember to check your spam folder if you can't locate the email. Once you receive it, simply follow the link provided in the email to log in to the Redbooth and Clockify integration.</p></div>
-                            : <div><h2 className="font-serif mb-4 text-6xl text-black tracking-tighter">Have You Forgotten Your Password?</h2>
-                                <p className="mb-7 text-xl text-black tracking-tight">Redbooth and Clockify integration.</p>
-                                <div className=" p-px bg-transparent overflow-hidden rounded-lg">
-                                    <p className="text-black transition duration-200 ml-2">We can send you a link to reset it.</p>
-                                </div>
-                                <form onSubmit={handleFormSubmit}  >
-                                    <div className="w-full md:w-1/2 p-3">
-                                        <label className="block">
-                                            <div className="mb-2 text-black font-semibold">
-                                                <span>
-                                                    Email
-                                                </span>
-                                            </div>
-                                            <input onChange={(e) => setEmail(e.target.value)} value={email} name="email" className="p-4 w-full text-gray-700 tracking-tight bg-white placeholder-gray-700 outline-none border border-gray-600 placeholder-light-gray-700 rounded-lg focus:border-indigo-500 transition duration-200" id="email" type="text" placeholder="you@example.com" required />
-                                        </label>
-                                    </div>
-
-                                    <div className="w-full md:w-1/2 p-3">
-                                        <button type="submit" className="p-4 w-full text-white font-semibold  bg-indigo-500 hover:bg-indigo-600 outline-none border border-gray-600 rounded-lg focus:border-indigo-500 transition duration-200">Send Link</button>
-                                    </div>
-                                </form></div>
-                    } </div>}
-                </div>
+  return (
+    <>
+      <Head>
+        <title>Forgot password</title>
+      </Head>
+      <div className="flex justify-center items-center h-screen">
+        {!resetToken ? (
+          <form
+            className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+            onSubmit={handleResetSubmit}
+          >
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="email"
+              >
+                Email
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="email"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={handleEmailChange}
+                required
+              />
             </div>
-        </section>
+            <div className="flex items-center justify-between">
+              <button
+                className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                type="submit"
+              >
+                Reset Password
+              </button>
+            </div>
+          </form>
+        ) : (
+          <form
+            className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+            onSubmit={handlePasswordResetSubmit}
+          >
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="email"
+              >
+                Email
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="email"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={handleEmailChange}
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="password"
+              >
+                Password
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="password"
+                type="password"
+                placeholder="New Password"
+                value={password}
+                onChange={handleNewPasswordChange}
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="confirmPassword"
+              >
+                Confirm Password
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={handleConfirmPasswordChange}
+                required
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <button
+                className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                type="submit"
+              >
+                {isLoading ? (
+                  <svg
+                    className="animate-spin h-5 w-5 mr-3"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 016 12H2c0 2.981 1.655 5.597 4 6.975V17zm10-5.291a7.962 7.962 0 01-2 5.291v-1.725c1.345-.378 2.3-1.494 2.4-2.766h-2.4zm-8-3.518v1.725c-1.345.378-2.3 1.494-2.4 2.766h2.4A7.962 7.962 0 016 11.709z"
+                    ></path>
+                  </svg>
+                ) : (
+                  <span> Reset Password</span>
+                )}
+              </button>
+            </div>
+          </form>
+        )}
+        {showModal && (
+          <PopUpModel
+            isOpen={showModal}
+            closeModal={closeModal}
+            title="Forgot password"
+            text={modalMessage}
+          />
+        )}
+      </div>
     </>
-}
+  );
+};
+
+export default ForgotPassword;

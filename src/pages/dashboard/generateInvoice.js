@@ -14,7 +14,7 @@ export default function GenerateInvoice() {
   const router = useRouter();
 
   const authToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1zb2hhaWxraGFuLnNlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjY0ZGI1MjFjYWZmMWNlMzI0NjAyYzg1ZSIsImlhdCI6MTY5Mjg2NjE1MSwiZXhwIjoxNjkyODY5NzUxfQ.u6sEhtCmxC7bPOLRib8J4DHKU-0_LbZTt1HBFIhbBzM";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1zb2hhaWxraGFuLnNlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjY0ZGI1MjFjYWZmMWNlMzI0NjAyYzg1ZSIsImlhdCI6MTY5MjkwMzM3NSwiZXhwIjoxNjkyOTA2OTc1fQ.LuvFYLIaYxptI9JFkXGwaPeYR1PnWXCawI3vItr5CHE";
 
   const initialValues = {
     userId: "",
