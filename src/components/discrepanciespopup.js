@@ -1,62 +1,48 @@
-import { React, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_URL = "http://localhost:3001/invoice/generate-weekly-summary/6237221";
 
-const discrepanciespopup = ({ togglePopup }) => {
-
+const DiscrepanciesPopup = ({ togglePopup }) => {
   const [data, setData] = useState([]);
+  const [totalLoggedHours, setTotalLoggedHours] = useState(0);
 
   useEffect(() => {
-    // Make the GET request to the API endpoint
     axios
-      .get("http://localhost:3001/invoice/generate-weekly-summary/6237221")
+      .get(API_URL)
       .then((response) => {
-        console.log("/invoice/generate-weekly-summary/6237221", response.data);
         setData(response.data.InvoiceItem);
+        calculateTotalLoggedHours(response.data.InvoiceItem);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
   }, []);
 
-  useEffect(() => {
-    // Make the GET request to the API endpoint
-    axios
-      .get("http://localhost:3001/generate-weekly-summary")
-      .then((response) => {
-        console.log("generate-weekly-summary", response.data);
-        setClockifyData(response.data.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
+  const calculateTotalLoggedHours = (invoiceData) => {
+    let totalHours = 0;
+    invoiceData.loggingsData.forEach((loggingsItem) => {
+      loggingsItem.projectLoggingsData.forEach((projectItem) => {
+        totalHours += projectItem.weeklyTotalLoggedHours;
       });
-  }, []);
-
+    });
+    setTotalLoggedHours(totalHours);
+  };
 
   return (
     <>
       <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
         <div className="bg-white p-4 rounded-md">
-          <h1 className="text-center mb-4 text-black font-semibold">Discrepancies between time logged RB / CF</h1>
+          <h1 className="text-center mb-4 text-black font-semibold">Discrepancies between RB / CF time logged </h1>
           <div className="bg-white p-4 rounded-md">
             <thead>
-              <tr>
-                <td className="px-6 py-2 text-xs font-medium leading-4 tracking-wider text-center text-gray-800 border-b border-gray-200 bg-gray-50">
-                  All Week's Redbooth <br />Logged Hours
+            <tr>
+                <td className="px-6 py-2 text-xs font-medium leading-4 tracking-wider text-left text-gray-800 border-b border-gray-200 bg-gray-50">
+                  Total Redbooth Logged Hours
                 </td>
                 <td className="px-6 py-2 text-xs font-medium leading-4 tracking-wider text-center text-gray-800 border-b border-gray-200 bg-gray-50">
-                  {data && data.loggingsData && data.loggingsData.length > 0 ? (
-                    data.loggingsData.map((loggingsItem, index) => (
-                      loggingsItem.projectLoggingsData.map((projectItem, projectIndex) => (
-                        <tr key={`${index}-${projectIndex}`} className="">
-                          <td className="px-6 py-2 text-xs font-medium leading-4 tracking-wider text-center text-gray-800 border-b border-gray-200 bg-gray-50">
-                            {projectItem.weeklyTotalLoggedHours}h
-                          </td>
-                        </tr>
-                      ))
-                    ))
-                  ) : null}
-                </td>
+                {totalLoggedHours.toFixed(2)} h
+                </td>                
               </tr>
             </thead>
             <thead>
@@ -86,7 +72,6 @@ const discrepanciespopup = ({ togglePopup }) => {
       </div>
     </>
   )
-
 };
 
-export default discrepanciespopup;
+export default DiscrepanciesPopup;
