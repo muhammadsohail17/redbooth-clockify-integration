@@ -2,10 +2,17 @@ import { React, useEffect, useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import Discrepanciespopup from "./discrepanciespopup";
 
 const RedboothData = () => {
   const [isRedboothDataVisible, setIsRedboothDataVisible] = useState(false);
   const [data, setData] = useState([]);
+  const [showPopup, setShowPopup] = useState(false); // State for popup visibility
+
+
+  const togglePopup = () => {
+    setShowPopup(!showPopup);
+  };
 
   const toggleRedBoothData = () => {
     setIsRedboothDataVisible((prev) => !prev);
@@ -39,9 +46,8 @@ const RedboothData = () => {
                 Redbooth Data
               </span>
               <span
-                className={`ml-auto h-5 w-5 transition-transform duration-200 ease-in-out ${
-                  isRedboothDataVisible ? "rotate-[-180deg]" : ""
-                }`}
+                className={`ml-auto h-5 w-5 transition-transform duration-200 ease-in-out ${isRedboothDataVisible ? "rotate-[-180deg]" : ""
+                  }`}
               >
                 <FontAwesomeIcon
                   icon={faChevronUp}
@@ -80,7 +86,7 @@ const RedboothData = () => {
                         (projectItem, projectIndex) => (
                           <tr
                             key={`${index}-${projectIndex}`}
-                            className="cursor-pointer"
+                            className=""
                           >
                             <td className="px-6 py-4 text-s font-normal text-center text-gray-500 border-b border-gray-200">
                               {loggingsItem.name}
@@ -88,8 +94,8 @@ const RedboothData = () => {
                             <td className="px-6 py-4 text-s font-normal text-center text-gray-500 border-b border-gray-200">
                               {projectItem.range}
                             </td>
-                            <td className="px-6 py-4 text-s font-normal text-center text-gray-500 border-b border-gray-200">
-                              {projectItem.weeklyTotalLoggedHours}
+                            <td className="cursor-pointer px-6 py-4 text-s font-normal text-center text-gray-500 border-b border-gray-200" onClick={togglePopup}>
+                              {projectItem.weeklyTotalLoggedHours}h
                             </td>
                           </tr>
                         )
@@ -108,6 +114,12 @@ const RedboothData = () => {
                 )}
               </tbody>
             </table>
+            {/* Popup */}
+            {showPopup && (
+            <div>
+              <Discrepanciespopup togglePopup={togglePopup} />
+              </div>
+            )}
           </div>
         </div>
       </div>

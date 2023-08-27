@@ -42,8 +42,11 @@ const Sidebar = () => {
             >
               <FontAwesomeIcon icon={faTimes} size="lg" />
             </button>
-            <h1 className="text-2xl font-bold text-white ml-6 mr-2">
-              Welcome {session?.user?.email}!
+            <h1 className="text-2xl font-bold text-white ml-10 mr-2">
+              Welcome
+            </h1>
+            <h1 className="text-1xl font-bold text-white mt-2">
+              {session?.user?.email}
             </h1>
             <Link href="api/auth/signout">
               <span>
