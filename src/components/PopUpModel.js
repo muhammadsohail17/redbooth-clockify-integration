@@ -16,15 +16,19 @@ const PopUpModel = ({ isOpen, closeModal, title, text }) => {
       >
         <div className="relative bg-white rounded-lg w-96 mx-auto p-6">
           <button
-            className="absolute top-2 right-2 text-gray-400 hover:text-gray-500"
+            className="absolute top-2 right-2 text-gray-700 hover:text-gray-800"
             onClick={closeModal}
           >
-            <FontAwesomeIcon icon={faTimes} className="text-xl mx-2" />
+            <FontAwesomeIcon
+              icon={faTimes}
+              rotate={180}
+              className="text-xl mx-2"
+            />
           </button>
           <h1 className="text-xl font-bold mb-4">{title}</h1>
           <p className="text-gray-600">{text}</p>
           <button
-            className="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            className="mt-6 bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded"
             onClick={closeModal}
           >
             Close
