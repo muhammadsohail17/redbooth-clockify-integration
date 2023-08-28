@@ -18,7 +18,6 @@ const Login = () => {
     axios
       .get("http://localhost:3001/user/get-registered-users")
       .then((response) => {
-        console.log(response.data);
         setRegisteredUsers(response.data);
       })
       .catch((error) => {
@@ -48,14 +47,13 @@ const Login = () => {
     // Check if the email is already registered
     if (!registeredUsers.includes(values.email)) {
       setShowModal(true);
-      console.log("Entered email:", values.email);
-      console.log("Registered emails:", registeredUsers);
       setModalMessage("Email is not registered");
       setIsLoading(false);
       return;
     }
 
     const result = await signIn("credentials", {
+      rbUserId: values.rbUserId,
       email: values.email,
       password: values.password,
       redirect: false,
@@ -133,7 +131,7 @@ const Login = () => {
             <div className="mb-4 flex justify-end item-center">
               {/* forgot password link */}
               <Link href="/forgot-password">
-                <span className="text-blue-500 hover:underline cursor-pointer">
+                <span className="text-gray-700 hover:underline cursor-pointer">
                   Forgot Password?
                 </span>
               </Link>
@@ -141,7 +139,7 @@ const Login = () => {
             <div className="mb-4">
               <button
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+                className="bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -176,7 +174,7 @@ const Login = () => {
           Don't have an account?{" "}
           <Link
             href="/signup"
-            className="text-blue-500 hover:underline font-bold"
+            className="text-gray-700 hover:underline font-bold"
           >
             Register
           </Link>

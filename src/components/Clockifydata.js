@@ -16,7 +16,6 @@ const Clockifydata = () => {
     axios
       .get("http://localhost:3001/generate-weekly-summary")
       .then((response) => {
-        console.log("generate-weekly-summary", response.data);
         setClockifyData(response.data.data);
       })
       .catch((error) => {

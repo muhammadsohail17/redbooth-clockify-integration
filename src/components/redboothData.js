@@ -1,5 +1,6 @@
-import { React, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
@@ -7,22 +8,36 @@ const RedboothData = () => {
   const [isRedboothDataVisible, setIsRedboothDataVisible] = useState(false);
   const [data, setData] = useState([]);
 
+  const { data: session } = useSession();
+
+  const rbUserId = session?.user?.rbUserId;
+
   const toggleRedBoothData = () => {
     setIsRedboothDataVisible((prev) => !prev);
   };
 
   useEffect(() => {
-    // Make the GET request to the API endpoint
-    axios
-      .get("http://localhost:3001/invoice/generate-weekly-summary/6237221")
-      .then((response) => {
-        console.log("/invoice/generate-weekly-summary/6237221", response.data);
-        setData(response.data.InvoiceItem);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, []);
+    if (rbUserId) {
+      axios
+        .get(
+          `http://localhost:3001/invoice/generate-weekly-summary/${rbUserId}`
+        )
+        .then((response) => {
+          console.log("/invoice/generate-weekly-summary", response.data);
+          setData(response.data.InvoiceItem);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+    }
+  }, [rbUserId]);
+
+  function formatTime(decimalTime) {
+    const hours = Math.floor(decimalTime);
+    const minutes = Math.round((decimalTime - hours) * 60);
+
+    return `${hours}h ${minutes}m`;
+  }
 
   return (
     <>
@@ -75,7 +90,7 @@ const RedboothData = () => {
               <tbody>
                 {data && data.loggingsData && data.loggingsData.length > 0 ? (
                   data.loggingsData.map((loggingsItem, index) => (
-                    <>
+                    <React.Fragment key={index}>
                       {loggingsItem.projectLoggingsData.map(
                         (projectItem, projectIndex) => (
                           <tr
@@ -89,12 +104,12 @@ const RedboothData = () => {
                               {projectItem.range}
                             </td>
                             <td className="px-6 py-4 text-s font-normal text-center text-gray-500 border-b border-gray-200">
-                              {projectItem.weeklyTotalLoggedHours}
+                              {formatTime(projectItem.weeklyTotalLoggedHours)}
                             </td>
                           </tr>
                         )
                       )}
-                    </>
+                    </React.Fragment>
                   ))
                 ) : (
                   <tr>

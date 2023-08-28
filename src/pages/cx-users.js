@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Headers from "@/components/Headers";
+import Head from "next/head";
 
 const CxUsers = () => {
   const [users, setUsers] = useState([]);
@@ -10,7 +11,6 @@ const CxUsers = () => {
     axios
       .get("http://localhost:3001/render-users")
       .then((response) => {
-        console.log(response.data.data);
         setUsers(response.data.data);
       })
       .catch((error) => {
@@ -21,6 +21,9 @@ const CxUsers = () => {
   return (
     <>
       <Headers />
+      <Head>
+        <title>Cx users</title>
+      </Head>
       <div className="container mx-auto px-4 py-4">
         <h2 className="text-2xl font-semibold mb-4 mt-4 text-center">
           CX Users

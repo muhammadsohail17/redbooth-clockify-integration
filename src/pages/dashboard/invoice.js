@@ -98,7 +98,7 @@ const Invoice = () => {
   return (
     <>
       <Head>
-        <title>Create Invoice</title>
+        <title>Invoice</title>
       </Head>
 
       <div id="invoice-container" className="container mx-auto p-4 mt-4">

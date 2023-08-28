@@ -12,7 +12,6 @@ const Sidebar = () => {
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const { data: session } = useSession();
-  console.log("sidebar session", session);
 
   const toggleSidebar = () => {
     setSidebarVisible(!sidebarVisible);
@@ -43,7 +42,10 @@ const Sidebar = () => {
               <FontAwesomeIcon icon={faTimes} size="lg" />
             </button>
             <h1 className="text-2xl font-bold text-white ml-6 mr-2">
-              Welcome {session?.user?.email}!
+              Welcome {session?.user?.rbUserId}!
+            </h1>
+            <h1 className="text-2xl font-bold text-white ml-6 mr-2">
+              {session?.user?.email}!
             </h1>
             <Link href="api/auth/signout">
               <span>
@@ -56,11 +58,6 @@ const Sidebar = () => {
               </span>
             </Link>
           </div>
-          {/* {projects.map((project, id) => (
-            <h1 key={id} className="text-white text-2xl">
-              {project.name}
-            </h1>
-          ))} */}
         </div>
       )}
     </>

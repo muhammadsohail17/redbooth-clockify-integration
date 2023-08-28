@@ -30,6 +30,8 @@ export const authOptions = {
         console.log("nextAuthuser", user);
 
         if (user) {
+          // Include rbUserId in the user object
+          user.rbUserId = credentials.rbUserId;
           return user; // Return the user object on successful authentication
         } else {
           return null; // Return null on failed authentication
@@ -38,13 +40,30 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async session({ session, token, user }) {
-      // You can access the rbUserId from the user object
-      if (user && user.rbUserId) {
-        session.rbUserId = user.rbUserId;
+    async jwt({ token, user, account }) {
+      if (account && user) {
+        return {
+          ...token,
+          accessToken: user.token,
+          refreshToken: user.refreshToken,
+          rbUserId: user.rbUserId,
+        };
       }
-      session.user = token;
-      return session;
+
+      return token;
+    },
+
+    async session({ session, token }) {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          accessToken: token.accessToken,
+          refreshToken: token.refreshToken,
+          accessTokenExpires: token.accessTokenExpires,
+          rbUserId: token.rbUserId,
+        },
+      };
     },
   },
   pages: {

@@ -49,7 +49,7 @@ const Signup = () => {
       await axios
         .post("http://localhost:3001/user/signup", values)
         .then((response) => {
-          console.log(response.data);
+          console.log("signup response", response.data);
           setIsLoading(false);
           setShowModal(true);
           setModalMessage("Registration successful!");
@@ -153,7 +153,7 @@ const Signup = () => {
             <div className="mb-4">
               <button
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+                className="bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded"
               >
                 {isLoading ? (
                   <svg

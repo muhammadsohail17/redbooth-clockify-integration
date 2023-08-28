@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "@/components/Headers";
+import Head from "next/head";
 
 const cxProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -9,7 +10,6 @@ const cxProjects = () => {
     axios
       .get("http://localhost:3001/projects")
       .then((response) => {
-        console.log(response.data.data);
         setProjects(response.data.data);
       })
       .catch((error) => console.error("Error fetching projects:", error));
@@ -17,6 +17,9 @@ const cxProjects = () => {
   return (
     <>
       <Header />
+      <Head>
+        <title>Cx projects</title>
+      </Head>
       <div className="container mx-auto p-8">
         <table className="w-full table-auto">
           <thead>

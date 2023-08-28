@@ -9,15 +9,11 @@ import { months, years } from "@/utils/const";
 
 export default function GenerateInvoice() {
   const { data: session } = useSession();
-  console.log("GenerateInvoice session", session);
 
   const router = useRouter();
 
-  const authToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1zb2hhaWxraGFuLnNlQGdtYWlsLmNvbSIsInVzZXJJZCI6IjY0ZGI1MjFjYWZmMWNlMzI0NjAyYzg1ZSIsImlhdCI6MTY5MjkwMzM3NSwiZXhwIjoxNjkyOTA2OTc1fQ.LuvFYLIaYxptI9JFkXGwaPeYR1PnWXCawI3vItr5CHE";
-
   const initialValues = {
-    userId: "",
+    userId: session?.user?.rbUserId || "",
     month: "",
     year: "",
     hourlyRate: "",
@@ -43,7 +39,7 @@ export default function GenerateInvoice() {
         values,
         {
           headers: {
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${session?.user?.accessToken}`,
           },
         }
       );
@@ -92,7 +88,7 @@ export default function GenerateInvoice() {
                   type="text"
                   id="userId"
                   name="userId"
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                 />
                 <ErrorMessage
                   name="userId"
@@ -113,7 +109,7 @@ export default function GenerateInvoice() {
                     as="select"
                     id="monthSelect"
                     name="month"
-                    className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                   >
                     {Object.keys(months).map((monthName) => (
                       <option key={months[monthName]} value={months[monthName]}>
@@ -139,7 +135,7 @@ export default function GenerateInvoice() {
                     as="select"
                     id="yearSelect"
                     name="year"
-                    className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                   >
                     {years.map((year) => (
                       <option key={year} value={year}>
@@ -166,7 +162,7 @@ export default function GenerateInvoice() {
                   type="text"
                   id="hourlyRate"
                   name="hourlyRate"
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                 />
                 <ErrorMessage
                   name="hourlyRate"
@@ -187,7 +183,7 @@ export default function GenerateInvoice() {
                   id="invoiceNo"
                   name="invoiceNo"
                   min="0"
-                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
                 />
                 <ErrorMessage
                   name="invoiceNo"

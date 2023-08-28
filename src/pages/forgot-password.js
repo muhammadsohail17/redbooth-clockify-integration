@@ -9,7 +9,6 @@ const ForgotPassword = () => {
   const [resetToken, setResetToken] = useState(""); // To store the reset token
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [resetSuccess, setResetSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
