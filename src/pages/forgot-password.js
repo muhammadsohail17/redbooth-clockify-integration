@@ -3,6 +3,9 @@ import axios from "axios";
 import Router from "next/router";
 import Head from "next/head";
 import PopUpModel from "@/components/PopUpModel";
+import { endPoints } from "@/rest_api/endpoints";
+
+const { REST_API, HOST_URL } = endPoints;
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -30,7 +33,7 @@ const ForgotPassword = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/user/forgot-password",
+        `${HOST_URL}${REST_API.Account.Forgot_password}`,
         {
           email: email,
         }
@@ -48,7 +51,7 @@ const ForgotPassword = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:3001/user/reset-password",
+        `${HOST_URL}${REST_API.Account.Reset_password}`,
         {
           email: email,
           token: resetToken,

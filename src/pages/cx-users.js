@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Headers from "@/components/Headers";
 import Head from "next/head";
+import { endPoints } from "@/rest_api/endpoints";
+
+const { REST_API, HOST_URL } = endPoints;
 
 const CxUsers = () => {
   const [users, setUsers] = useState([]);
@@ -9,7 +12,7 @@ const CxUsers = () => {
   useEffect(() => {
     // Make the GET request to the API endpoint
     axios
-      .get("http://localhost:3001/render-users")
+      .get(`${HOST_URL}${REST_API.CxRedbooth.ConnextarUsers}`)
       .then((response) => {
         setUsers(response.data.data);
       })

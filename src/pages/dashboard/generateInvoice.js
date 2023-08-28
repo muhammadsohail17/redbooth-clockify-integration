@@ -6,6 +6,9 @@ import { useRouter } from "next/router";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { months, years } from "@/utils/const";
+import { endPoints } from "@/rest_api/endpoints";
+
+const { REST_API, HOST_URL } = endPoints;
 
 export default function GenerateInvoice() {
   const { data: session } = useSession();
@@ -35,7 +38,7 @@ export default function GenerateInvoice() {
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/invoice/generate-invoice",
+        `${HOST_URL}${REST_API.Invoice.GenerateInvoice}`,
         values,
         {
           headers: {

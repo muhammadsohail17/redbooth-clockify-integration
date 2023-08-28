@@ -1,7 +1,8 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { endPoints } from "@/rest_api/endpoints";
 
-// const uri = process.env.MONGODB_URI;
+const { REST_API, HOST_URL } = endPoints;
 
 export const authOptions = {
   providers: [
@@ -14,7 +15,7 @@ export const authOptions = {
       },
       async authorize(credentials) {
         // Add your authentication logic here
-        const res = await fetch("http://localhost:3001/user/login", {
+        const res = await fetch(`${HOST_URL}${REST_API.Account.LogIn}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

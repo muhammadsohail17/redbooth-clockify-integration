@@ -2,6 +2,9 @@ import { React, useEffect, useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import { endPoints } from "@/rest_api/endpoints";
+
+const { REST_API, HOST_URL } = endPoints;
 
 const Clockifydata = () => {
   const [isClockifyDataVisible, setIsClockifyDataVisible] = useState(false);
@@ -14,7 +17,7 @@ const Clockifydata = () => {
   useEffect(() => {
     // Make the GET request to the API endpoint
     axios
-      .get("http://localhost:3001/generate-weekly-summary")
+      .get(`${HOST_URL}${REST_API.CxClockify.WeeklySummary}`)
       .then((response) => {
         setClockifyData(response.data.data);
       })
