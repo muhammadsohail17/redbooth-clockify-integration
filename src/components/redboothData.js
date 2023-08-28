@@ -3,10 +3,16 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import Discrepanciespopup from "./discrepanciespopup";
 
 const RedboothData = () => {
   const [isRedboothDataVisible, setIsRedboothDataVisible] = useState(false);
   const [data, setData] = useState([]);
+  const [showPopup, setShowPopup] = useState(false); // State for popup visibility
+
+  const togglePopup = () => {
+    setShowPopup(!showPopup);
+  };
 
   const { data: session } = useSession();
 
@@ -93,10 +99,7 @@ const RedboothData = () => {
                     <React.Fragment key={index}>
                       {loggingsItem.projectLoggingsData.map(
                         (projectItem, projectIndex) => (
-                          <tr
-                            key={`${index}-${projectIndex}`}
-                            className="cursor-pointer"
-                          >
+                          <tr key={`${index}-${projectIndex}`} className="">
                             <td className="px-6 py-4 text-s font-normal text-center text-gray-500 border-b border-gray-200">
                               {loggingsItem.name}
                             </td>
@@ -123,6 +126,12 @@ const RedboothData = () => {
                 )}
               </tbody>
             </table>
+            {/* Popup */}
+            {showPopup && (
+              <div>
+                <Discrepanciespopup togglePopup={togglePopup} />
+              </div>
+            )}
           </div>
         </div>
       </div>
