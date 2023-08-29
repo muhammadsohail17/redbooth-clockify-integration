@@ -7,6 +7,8 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { months, years } from "@/utils/const";
 import { endPoints } from "@/rest_api/endpoints";
+import { messages } from "@/utils/messages";
+import { handleApiError } from "@/utils/handleApiError";
 
 const { REST_API, HOST_URL } = endPoints;
 
@@ -24,15 +26,15 @@ export default function GenerateInvoice() {
   };
 
   const validationSchema = Yup.object().shape({
-    userId: Yup.string().required("rbUserId is required"),
+    userId: Yup.string().required(messages.validation.rbUserId),
     hourlyRate: Yup.number()
-      .required("Hourly rate is required")
-      .positive("Hourly rate must be positive")
-      .typeError("Hourly rate must be a number"),
+      .required(messages.validation.requiredHourlyRate)
+      .positive(messages.validation.positiveHourlyRate)
+      .typeError(messages.validation.hourlrRateType),
     invoiceNo: Yup.number()
-      .required("Invoice number is required")
-      .integer("Invoice number must be an integer")
-      .min(0, "Invoice number must be a positive integer"),
+      .required(messages.validation.requiredInvoiceNumber)
+      .integer(messages.validation.invoiceNumberType)
+      .min(0, messages.validation.positiveInvoiceNumber),
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -46,14 +48,13 @@ export default function GenerateInvoice() {
           },
         }
       );
-      console.log("Invoice generated successfully:", response.data);
       // Redirect to another page with invoiceItem as query parameter
       router.push({
         pathname: "/dashboard/invoice",
         query: { invoice_data: JSON.stringify(response.data) },
       });
     } catch (error) {
-      console.error("Error generating invoice:", error);
+      handleApiError(error);
     } finally {
       setSubmitting(false);
     }

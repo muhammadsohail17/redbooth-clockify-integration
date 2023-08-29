@@ -5,7 +5,12 @@ import * as Yup from "yup";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useSession, signIn } from "next-auth/react";
-import PopUpModel from "@/components/PopUpModel";
+import PopUpModel from "@/common/PopUpModel";
+import { handleApiError } from "@/utils/handleApiError";
+import { endPoints } from "@/rest_api/endpoints";
+import { messages } from "@/utils/messages";
+
+const { REST_API, HOST_URL } = endPoints;
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false); // State variable for loading...
@@ -16,12 +21,12 @@ const Login = () => {
   useEffect(() => {
     // Fetch registered emails from the backend API
     axios
-      .get("http://localhost:3001/user/get-registered-users")
+      .get(`${HOST_URL}${REST_API.Account.RegisteredUser}`)
       .then((response) => {
         setRegisteredUsers(response.data);
       })
       .catch((error) => {
-        console.error("Error fetching registered emails:", error);
+        handleApiError(error);
       });
   }, []);
 
@@ -37,9 +42,14 @@ const Login = () => {
   };
 
   const validationSchema = Yup.object({
-    rbUserId: Yup.string().required("Required"),
-    email: Yup.string().email("Invalid email address").required("Required"),
-    password: Yup.string().required("Required"),
+    rbUserId: Yup.string().required(messages.validation.rbUserId),
+    email: Yup.string()
+      .email(messages.validation.invalidEmail)
+      .required(messages.validation.requiredEmail),
+
+    password: Yup.string()
+      .required(messages.validation.requiredPassword)
+      .min(8, messages.validation.minimumPassword),
   });
 
   const handleSubmit = async (values) => {
@@ -47,7 +57,7 @@ const Login = () => {
     // Check if the email is already registered
     if (!registeredUsers.includes(values.email)) {
       setShowModal(true);
-      setModalMessage("Email is not registered");
+      setModalMessage(messages.validation.unRegisteredEmail);
       setIsLoading(false);
       return;
     }
@@ -63,11 +73,10 @@ const Login = () => {
 
     if (result.error) {
       setShowModal(true);
-      setModalMessage("Invalid email or password");
-      console.log("Login failed:", result.error);
+      setModalMessage(messages.validation.invalid);
     } else {
       setShowModal(true);
-      setModalMessage("Login successful!");
+      setModalMessage(messages.showSuccessMessage.loginSuccess);
       router.replace("/dashboard");
     }
   };

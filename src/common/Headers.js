@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import connextar_logo from "../resources/images/connextar-logo-dark.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -58,6 +59,17 @@ const Header = () => {
               className="text-white hover:text-gray-200 border border-gray-200 hover:border-gray-300 p-2 rounded-md block md:inline"
             >
               Generate Invoice
+            </a>
+            <a
+              href="api/auth/signout"
+              className="text-white hover:text-gray-200 block md:inline p-2"
+              title="Sign Out"
+            >
+              <FontAwesomeIcon
+                icon={faSignOutAlt}
+                className="text-white hover:text-gray-200"
+                aria-label="Sign Out"
+              />
             </a>
           </div>
         </div>

@@ -4,6 +4,8 @@ export const handleApiError = (error) => {
     404: "Resource not found. Please try again later.",
     409: "Email already exists. Please use a different email.",
     500: "Server error. Please try again later.",
+    400: "Bad Request.",
+    401: "Unauthorized",
     // Add more status codes and corresponding messages as needed
   };
 

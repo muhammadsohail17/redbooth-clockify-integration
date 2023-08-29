@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Header from "@/components/Headers";
+import Header from "@/common/Headers";
 import Head from "next/head";
 import { endPoints } from "@/rest_api/endpoints";
+import { handleApiError } from "@/utils/handleApiError";
 
 const { REST_API, HOST_URL } = endPoints;
 
@@ -15,7 +16,9 @@ const CxProjects = () => {
       .then((response) => {
         setProjects(response.data.data);
       })
-      .catch((error) => console.error("Error fetching projects:", error));
+      .catch((error) => {
+        handleApiError(error);
+      });
   }, []);
   return (
     <>

@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import axios from "axios";
 import Router from "next/router";
 import Head from "next/head";
-import PopUpModel from "@/components/PopUpModel";
+import PopUpModel from "@/common/PopUpModel";
 import { endPoints } from "@/rest_api/endpoints";
+import { messages } from "@/utils/messages";
+import { handleApiError } from "@/utils/handleApiError";
 
 const { REST_API, HOST_URL } = endPoints;
 
@@ -38,11 +40,9 @@ const ForgotPassword = () => {
           email: email,
         }
       );
-      console.log("forgot password response:", response.data);
-
       setResetToken(response.data.resetToken);
     } catch (error) {
-      console.log("An error occurred. Please try again later.");
+      handleApiError(error);
     }
   };
 
@@ -51,7 +51,7 @@ const ForgotPassword = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        `${HOST_URL}${REST_API.Account.Reset_password}`,
+        `${HOST_URL}${REST_API.Account.ResetPassword}`,
         {
           email: email,
           token: resetToken,
@@ -62,15 +62,15 @@ const ForgotPassword = () => {
       setShowModal(true);
       setModalMessage(
         response.data.status === 1
-          ? "Password reset successful!"
-          : "Invalid password"
+          ? messages.showSuccessMessage.passwordReset
+          : messages.validation.invalidPassword
       );
       if (response.data.status == 1) {
         Router.replace("/dashboard");
       }
     } catch (error) {
       setShowModal(true);
-      setModalMessage("Password and confirm password do not match!");
+      setModalMessage(messages.showErrorMessage.passwordError);
     } finally {
       setIsLoading(false);
     }

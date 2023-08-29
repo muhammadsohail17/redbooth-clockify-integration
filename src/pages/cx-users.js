@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Headers from "@/components/Headers";
+import Headers from "@/common/Headers";
 import Head from "next/head";
 import { endPoints } from "@/rest_api/endpoints";
+import { handleApiError } from "@/utils/handleApiError";
+import Footer from "@/common/Footer";
 
 const { REST_API, HOST_URL } = endPoints;
 
@@ -17,7 +19,7 @@ const CxUsers = () => {
         setUsers(response.data.data);
       })
       .catch((error) => {
-        console.error("Error fetching data:", error);
+        handleApiError(error);
       });
   }, []);
 
@@ -50,6 +52,7 @@ const CxUsers = () => {
           </tbody>
         </table>
       </div>
+      <Footer />
     </>
   );
 };

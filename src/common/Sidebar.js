@@ -1,11 +1,6 @@
 import React, { useState } from "react";
-import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBars,
-  faTimes,
-  faSignOutAlt,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useSession } from "next-auth/react";
 
 const Sidebar = () => {
@@ -41,22 +36,12 @@ const Sidebar = () => {
             >
               <FontAwesomeIcon icon={faTimes} size="lg" />
             </button>
-            <h1 className="text-2xl font-bold text-white ml-6 mr-2">
-              Welcome {session?.user?.rbUserId}!
+            <h1 className="text-2xl font-bold text-white ml-6 mr-2 mb-4">
+              Welcome {session?.user?.rbUserId}
             </h1>
             <h1 className="text-2xl font-bold text-white ml-6 mr-2">
               {session?.user?.email}!
             </h1>
-            <Link href="api/auth/signout">
-              <span>
-                <FontAwesomeIcon
-                  icon={faSignOutAlt}
-                  rotation={180}
-                  className="text-white hover:text-red-400 cursor-pointer absolute bottom-0"
-                  aria-label="Sign Out"
-                />
-              </span>
-            </Link>
           </div>
         </div>
       )}
