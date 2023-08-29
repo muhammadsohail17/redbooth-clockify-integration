@@ -5,6 +5,9 @@ import * as Yup from "yup";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { handleApiError } from "@/utils/handleApiError";
+import { endPoints } from "@/rest_api/endpoints";
+
+const { REST_API, HOST_URL } = endPoints;
 
 const Signup = () => {
   const [isRegistered, setIsRegistered] = useState(false);
@@ -47,9 +50,9 @@ const Signup = () => {
     try {
       // Make the API call to localhost:3001/user/signup
       await axios
-        .post("http://localhost:3001/user/signup", values)
+        .post(`${HOST_URL}${REST_API.Account.Register}`, values)
         .then((response) => {
-          console.log(response.data);
+          console.log("signup response", response.data);
           setIsLoading(false);
           setShowModal(true);
           setModalMessage("Registration successful!");
@@ -153,7 +156,7 @@ const Signup = () => {
             <div className="mb-4">
               <button
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+                className="bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded"
               >
                 {isLoading ? (
                   <svg

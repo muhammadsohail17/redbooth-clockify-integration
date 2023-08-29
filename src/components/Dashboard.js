@@ -1,16 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { unixTimestampToDate } from "../data/util";
+import React from "react";
 import Header from "./Headers";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
-import { useSession } from "next-auth/react";
 import Clockifydata from "./Clockifydata";
-import axios from "axios";
 import RedboothData from "./redboothData";
 
-export default function Dashboard({ data }) {
-  console.log("dashboard data", data);
-
+export default function Dashboard() {
   return (
     <>
       <Header />

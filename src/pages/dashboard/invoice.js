@@ -12,6 +12,9 @@ import {
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+import { endPoints } from "@/rest_api/endpoints";
+
+const { REST_API, HOST_URL } = endPoints;
 
 const Invoice = () => {
   const [customItems, setCustomItems] = useState([]);
@@ -67,7 +70,7 @@ const Invoice = () => {
   const downloadPDF = async () => {
     console.log("createPDF clicked");
     axios({
-      url: "http://localhost:3001/invoice/generate-invoice/pdf",
+      url: `${HOST_URL}${REST_API.Invoice.DownloadPDF}`,
       method: "POST",
       data: invoiceData.invoice,
       responseType: "blob",
@@ -98,7 +101,7 @@ const Invoice = () => {
   return (
     <>
       <Head>
-        <title>Create Invoice</title>
+        <title>Invoice</title>
       </Head>
 
       <div id="invoice-container" className="container mx-auto p-4 mt-4">

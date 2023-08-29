@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "@/components/Headers";
+import Head from "next/head";
+import { endPoints } from "@/rest_api/endpoints";
 
-const cxProjects = () => {
+const { REST_API, HOST_URL } = endPoints;
+
+const CxProjects = () => {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
     axios
-      .get("http://localhost:3001/projects")
+      .get(`${HOST_URL}${REST_API.CxRedbooth.ConnextarProjects}`)
       .then((response) => {
-        console.log(response.data.data);
         setProjects(response.data.data);
       })
       .catch((error) => console.error("Error fetching projects:", error));
@@ -17,6 +20,9 @@ const cxProjects = () => {
   return (
     <>
       <Header />
+      <Head>
+        <title>Cx projects</title>
+      </Head>
       <div className="container mx-auto p-8">
         <table className="w-full table-auto">
           <thead>
@@ -41,4 +47,4 @@ const cxProjects = () => {
   );
 };
 
-export default cxProjects;
+export default CxProjects;
