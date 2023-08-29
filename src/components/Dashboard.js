@@ -1,7 +1,7 @@
 import React from "react";
-import Header from "./Headers";
-import Sidebar from "./Sidebar";
-import Footer from "./Footer";
+import Header from "../common/Headers";
+import Footer from "../common/Footer";
+import Sidebar from "../common/Sidebar";
 import Clockifydata from "./Clockifydata";
 import RedboothData from "./redboothData";
 

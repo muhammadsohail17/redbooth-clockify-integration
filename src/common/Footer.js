@@ -4,10 +4,10 @@ import connextarFavicon from "../resources/images/connextar-favicon.png";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-800 text-gray-300 py-10">
+    <footer className="bg-gray-800 text-white py-6">
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap justify-between">
-          <div className="w-full md:w-1/2 lg:w-1/3">
+          <div className="w-full md:w-1/2 lg:w-1/3 mt-6 md:mt-0">
             <h2 className="text-xl mb-4">About Us</h2>
             <p className="text-sm">
               Building high-performance software for tomorrow's needs.
@@ -50,7 +50,7 @@ const Footer = () => {
             </ul>
           </div>
         </div>
-        <div className="mt-10 border-t border-gray-800 pt-4">
+        <div className="mt-6 border-t border-gray-800">
           <div className="flex items-center justify-between">
             <a href="#">
               <Image src={connextarFavicon} alt="logo" />

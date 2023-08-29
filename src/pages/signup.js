@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import PopUpModel from "@/components/PopUpModel";
+import PopUpModel from "@/common/PopUpModel";
 import * as Yup from "yup";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { handleApiError } from "@/utils/handleApiError";
 import { endPoints } from "@/rest_api/endpoints";
+import { messages } from "@/utils/messages";
 
 const { REST_API, HOST_URL } = endPoints;
 
@@ -33,16 +34,15 @@ const Signup = () => {
   };
 
   const validationSchema = Yup.object({
-    rbUserId: Yup.string().required("Required"),
-    name: Yup.string().required("Required"),
-    email: Yup.string().email("Invalid email address").required("Required"),
+    rbUserId: Yup.string().required(messages.validation.rbUserId),
+    name: Yup.string().required(messages.validation.requiredName),
+    email: Yup.string()
+      .email(messages.validation.invalidEmail)
+      .required(messages.validation.requiredField),
     password: Yup.string()
-      .required("Required")
-      .min(8, "Password must be at least 8 characters long"),
-    acceptTerms: Yup.bool().oneOf(
-      [true],
-      "You must accept the terms and conditions."
-    ),
+      .required(messages.validation.requiredField)
+      .min(8, messages.validation.minimumPassword),
+    acceptTerms: Yup.bool().oneOf([true], messages.validation.acceptTerms),
   });
 
   const handleSubmit = async (values) => {
@@ -51,11 +51,10 @@ const Signup = () => {
       // Make the API call to localhost:3001/user/signup
       await axios
         .post(`${HOST_URL}${REST_API.Account.Register}`, values)
-        .then((response) => {
-          console.log("signup response", response.data);
+        .then(() => {
           setIsLoading(false);
           setShowModal(true);
-          setModalMessage("Registration successful!");
+          setModalMessage(messages.showSuccessMessage.signupSuccess);
           setIsRegistered(true);
         });
     } catch (error) {

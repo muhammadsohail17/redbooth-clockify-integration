@@ -3,7 +3,6 @@ import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import connextar_logo from "../../resources/images/connextar-logo-dark.png";
 import {
   faDownload,
   faEnvelope,
@@ -13,6 +12,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { endPoints } from "@/rest_api/endpoints";
+import { handleApiError } from "@/utils/handleApiError";
 
 const { REST_API, HOST_URL } = endPoints;
 
@@ -28,7 +28,7 @@ const Invoice = () => {
     try {
       invoiceData = JSON.parse(decodeURIComponent(invoiceItemString));
     } catch (error) {
-      console.error("Error parsing invoice_item JSON:", error);
+      handleApiError(error);
     }
   }
 
@@ -94,7 +94,7 @@ const Invoice = () => {
         URL.revokeObjectURL(href);
       })
       .catch((error) => {
-        console.log(error);
+        handleApiError(error);
       });
   };
 
@@ -109,7 +109,13 @@ const Invoice = () => {
           <div>
             {/* Logo or brand */}
             <a href="/">
-              <Image src={connextar_logo} alt="logo" />
+              <Image
+                src="/_next/static/media/connextar-logo-dark.1acfc47a.png"
+                alt="Connextar Logo"
+                width={200}
+                height={58}
+                priority
+              />
             </a>
             <h1 className="text-2xl font-bold my-4">
               {invoiceData.invoice_item.name}

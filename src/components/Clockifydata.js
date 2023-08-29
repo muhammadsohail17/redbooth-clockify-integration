@@ -3,6 +3,7 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import { endPoints } from "@/rest_api/endpoints";
+import { handleApiError } from "@/utils/handleApiError";
 
 const { REST_API, HOST_URL } = endPoints;
 
@@ -22,7 +23,7 @@ const Clockifydata = () => {
         setClockifyData(response.data.data);
       })
       .catch((error) => {
-        console.error("Error fetching data:", error);
+        handleApiError(error);
       });
   }, []);
 

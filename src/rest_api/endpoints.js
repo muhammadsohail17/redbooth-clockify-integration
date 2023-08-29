@@ -7,7 +7,8 @@ export const endPoints = {
       LogIn: "user/login",
       Register: "user/signup",
       Forgot_password: "user/forgot-password",
-      Reset_password: "reset-password",
+      ResetPassword: "user/reset-password",
+      RegisteredUser: "user/get-registered-users",
     },
     CxRedbooth: {
       ConnextarUsers: "cx-users",

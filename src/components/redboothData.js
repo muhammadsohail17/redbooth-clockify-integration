@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import Discrepanciespopup from "./discrepanciespopup";
 import { endPoints } from "@/rest_api/endpoints";
+import { handleApiError } from "@/utils/handleApiError";
 
 const { REST_API, HOST_URL } = endPoints;
 
@@ -32,11 +33,10 @@ const RedboothData = () => {
           `${HOST_URL}${REST_API.CxRedbooth.GenerateWeeklySummary}${rbUserId}`
         )
         .then((response) => {
-          console.log("/invoice/generate-weekly-summary", response.data);
           setData(response.data.InvoiceItem);
         })
         .catch((error) => {
-          console.error("Error fetching data:", error);
+          handleApiError(error);
         });
     }
   }, [rbUserId]);
