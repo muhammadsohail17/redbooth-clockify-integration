@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import Head from "next/head";
 import { useSession } from "next-auth/react";
@@ -13,6 +13,7 @@ import { handleApiError } from "@/utils/handleApiError";
 const { REST_API, HOST_URL } = endPoints;
 
 export default function GenerateInvoice() {
+  const [isLoading, setIsLoading] = useState(false);
   const { data: session } = useSession();
 
   const router = useRouter();
@@ -38,6 +39,7 @@ export default function GenerateInvoice() {
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
+    setIsLoading(true);
     try {
       const response = await axios.post(
         `${HOST_URL}${REST_API.Invoice.GenerateInvoice}`,
@@ -48,6 +50,7 @@ export default function GenerateInvoice() {
           },
         }
       );
+      setIsLoading(false);
       // Redirect to another page with invoiceItem as query parameter
       router.push({
         pathname: "/dashboard/invoice",
@@ -197,9 +200,32 @@ export default function GenerateInvoice() {
               </div>
               <button
                 type="submit"
-                className="w-full py-3 px-4 text-white bg-gray-600 hover:bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                className="bg-gray-700 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded"
               >
-                Generate Invoice
+                {isLoading ? (
+                  <svg
+                    className="animate-spin h-5 w-5 mr-3"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 016 12H2c0 2.981 1.655 5.597 4 6.975V17zm10-5.291a7.962 7.962 0 01-2 5.291v-1.725c1.345-.378 2.3-1.494 2.4-2.766h-2.4zm-8-3.518v1.725c-1.345.378-2.3 1.494-2.4 2.766h2.4A7.962 7.962 0 016 11.709z"
+                    ></path>
+                  </svg>
+                ) : (
+                  <span>Generate Invoice</span>
+                )}
               </button>
             </Form>
           </Formik>
