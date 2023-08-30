@@ -22,7 +22,7 @@ const Signup = () => {
   useEffect(() => {
     if (isRegistered) {
       // Redirect to the dashboard page after successful registration
-      router.push("/dashboard");
+      router.push("/login");
     }
   }, [isRegistered]);
 
