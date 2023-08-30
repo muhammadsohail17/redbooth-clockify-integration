@@ -20,7 +20,7 @@ export const endPoints = {
     },
     Invoice: {
       GenerateInvoice: "invoice/generate-invoice",
-      DownloadPDF: "invoice/generate-invoice/pdf",
+      DownloadPDF: "invoice/generate-invoice/pdf/",
     },
   },
 };

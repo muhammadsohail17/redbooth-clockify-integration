@@ -26,16 +26,17 @@ export const authOptions = {
             password: credentials?.password,
           }),
         });
-        const user = await res.json();
+        const responseJson = await res.json();
 
-        console.log("nextAuthuser", user);
+        console.log("nextAuthuser", responseJson);
 
-        if (user) {
-          // Include rbUserId in the user object
+        if (res.ok) {
+          const user = responseJson;
           user.rbUserId = credentials.rbUserId;
           return user; // Return the user object on successful authentication
         } else {
-          return null; // Return null on failed authentication
+          // Authentication failed
+          throw new Error(responseJson.error); // Throw an error with the specific error message
         }
       },
     }),

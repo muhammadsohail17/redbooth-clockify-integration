@@ -70,9 +70,8 @@ const Invoice = () => {
   const downloadPDF = async () => {
     console.log("createPDF clicked");
     axios({
-      url: `${HOST_URL}${REST_API.Invoice.DownloadPDF}`,
-      method: "POST",
-      data: invoiceData.invoice,
+      url: `${HOST_URL}${REST_API.Invoice.DownloadPDF}${invoiceData.invoice_item.rbUserId}`,
+      method: "GET",
       responseType: "blob",
     })
       .then((res) => {
