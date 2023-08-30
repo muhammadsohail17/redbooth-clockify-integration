@@ -62,22 +62,34 @@ const Login = () => {
       return;
     }
 
-    const result = await signIn("credentials", {
-      rbUserId: values.rbUserId,
-      email: values.email,
-      password: values.password,
-      redirect: false,
-    });
-    setIsLoading(false);
-    console.log("result", result);
+    try {
+      const result = await signIn("credentials", {
+        rbUserId: values.rbUserId,
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
 
-    if (result.error) {
+      if (result.error) {
+        setShowModal(true);
+        setModalMessage(result.error);
+      } else if (result.ok) {
+        // Login was successful
+        setShowModal(true);
+        setModalMessage(messages.showSuccessMessage.loginSuccess);
+        router.replace("/dashboard");
+      } else {
+        // Handle other cases, such as result.unknown, etc.
+        setShowModal(true);
+        setModalMessage(messages.validation.networkError);
+      }
+    } catch (error) {
+      // Handle unexpected errors or exceptions
+      console.error("An error occurred during login:", error);
       setShowModal(true);
-      setModalMessage(messages.validation.invalid);
-    } else {
-      setShowModal(true);
-      setModalMessage(messages.showSuccessMessage.loginSuccess);
-      router.replace("/dashboard");
+      setModalMessage(messages.validation.networkError);
+    } finally {
+      setIsLoading(false);
     }
   };
 
